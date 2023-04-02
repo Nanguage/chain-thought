@@ -1,35 +1,62 @@
-import { Configuration, OpenAIApi } from 'openai';
 import { Message } from '../types/message';
+import { ChatGPTMessage } from "../types/message";
+import { OpenAI } from "openai-streams";
 
 
 const convertSenderToRole = (sender: 'user' | 'bot'): 'user' | 'assistant' => {
   return sender === 'bot' ? 'assistant' : 'user';
 };
 
-
-export const sendMessage = async (messages: Message[], apiKey: string): Promise<string> => {
-  const configuration = new Configuration({
-    apiKey: apiKey
-  });
-  const openai = new OpenAIApi(configuration);
-
-
-  // 将现有消息转换为 ChatGPT API 格式
-  const formattedMessages = messages.map((msg) => ({
-    role: convertSenderToRole(msg.sender),
-    content: msg.content,
+export async function sendMessage(
+  messages: Message[],
+  apiKey: string,
+  onMessageReceived: (message: string) => void
+): Promise<void> {
+  const formattedMessages: ChatGPTMessage[] = messages.map((message) => ({
+    role: convertSenderToRole(message.sender),
+    content: message.content,
   }));
 
-  try {
+  const stream = await OpenAI("chat", {
+    model: "gpt-3.5-turbo",
+    messages: formattedMessages,
+    temperature: 0.8,
+    top_p: 1,
+    frequency_penalty: 0,
+    presence_penalty: 0,
+  }, { apiKey });
 
-    const completion = await openai.createChatCompletion({
-      model: 'gpt-3.5-turbo',
-      messages: formattedMessages,
-    });
 
-    return completion.data.choices[0]?.message?.content ?? 'Error: No response from ChatGPT';
-  } catch (error) {
-    console.error('Error sending message:', error);
-    throw error;
+  const reader = stream.getReader();
+  const decoder = new TextDecoder("utf-8");
+
+  async function readStream() {
+    try {
+      const { value, done } = await reader.read();
+      if (done) {
+        return;
+      }
+
+      const text = decoder.decode(value);
+      const rep = JSON.parse(text)
+      // if role in rep, content = '[start]'
+      // elif content not in rep, content = '[end]'
+      let content
+      if (rep['role'] === 'assistant') {
+        content = '[start]'
+      } else if (rep['content'] === undefined) {
+        content = '[end]'
+      } else {
+        content = rep['content']
+      }
+
+      onMessageReceived(content);
+
+      readStream();
+    } catch (error) {
+      console.error("Error:", error);
+    }
   }
-};
+
+  readStream();
+}
