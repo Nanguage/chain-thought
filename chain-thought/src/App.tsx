@@ -6,7 +6,7 @@ import { ChatWindow } from './components/ChatWindow';
 const App: React.FC = () => {
   return (
     <div className="h-screen bg-gray-100 flex items-stretch md:items-center justify-center">
-      <div id="chatbackground" className="bg-white w-full h-full md:max-w-md md:h-[600px] rounded-lg shadow-md p-4 flex flex-col">
+      <div id="chatbackground" className="bg-white w-full h-full md:max-w-xl md:h-[800px] rounded-lg shadow-md p-4 flex flex-col">
         <ChatWindow />
       </div>
     </div>
