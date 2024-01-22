@@ -15,33 +15,32 @@ export const ChatWindow: React.FC = () => {
   const [apiKey, setApiKey] = useState(default_key);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
+  const handleMessageReceived = (messages: Message[], recv: string) => {
+    if (recv === "[start]") {
+      setMessages([...messages, {sender: 'bot', content: "", timestamp: new Date().toLocaleTimeString()}])
+    } else if (recv === "[end]") {
+      setReply("")
+    } else {
+      console.log(recv)
+      setReply((prev) => prev.concat(recv))
+    }
+  };
+
   const handleSendMessage = async (message: string) => {
     const updatedMessages: Message[] = [
       ...messages,
       { sender: "user", content: message, timestamp: new Date().toLocaleTimeString() },
     ];
-
     setMessages(updatedMessages)
-
     try {
-      const handleMessageReceived = (receivedMessage: string) => {
-        console.log(receivedMessage)
-        if (receivedMessage === "[start]") {
-          setMessages([...updatedMessages, {sender: 'bot', content: "", timestamp: new Date().toLocaleTimeString()}])
-        } else if (receivedMessage === "[end]") {
-          setReply("")
-        } else {
-          setReply(prevReply => prevReply + receivedMessage)
-        }
-      };
-
-      await sendMessage(updatedMessages, apiKey, handleMessageReceived);
+      await sendMessage(updatedMessages, apiKey, (recv) => handleMessageReceived(updatedMessages, recv));
     } catch (error) {
       console.error('Error getting response from ChatGPT:', error);
     }
   };
 
   useEffect(() => {
+    console.log("Reply: " + reply + "\n")
     if (reply) {
       const updatedMessages: Message[] = [
         ...messages.slice(0, messages.length - 1),

@@ -31,11 +31,14 @@ export async function sendMessage(
   const decoder = new TextDecoder("utf-8");
 
   async function readStream() {
-    try {
+    while (true) {
       const { value, done } = await reader.read();
       if (done) {
         return;
       }
+
+      // sleep for 0.01 seconds
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       const text = decoder.decode(value);
       const rep = JSON.parse(text)
@@ -51,10 +54,6 @@ export async function sendMessage(
       }
 
       onMessageReceived(content);
-
-      readStream();
-    } catch (error) {
-      console.error("Error:", error);
     }
   }
 
