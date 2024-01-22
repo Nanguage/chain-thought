@@ -1,5 +1,9 @@
 import React from 'react';
 import { Message } from '../types/message';
+import Markdown from 'react-markdown'
+import { Prism } from 'react-syntax-highlighter'
+import { nord } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+
 import PersonIcon from '@mui/icons-material/Person';
 import SmartToySharpIcon from '@mui/icons-material/SmartToySharp';
 
@@ -22,7 +26,30 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
       </div>
 
       <div className={`rounded-lg px-4 py-2 my-2 ${messageClass}`}>
-        {message.content}
+        <Markdown
+          children={message.content}
+          components={{
+            code(props) {
+              const {children, className, node, ...rest} = props
+              const match = /language-(\w+)/.exec(className || '')
+              const res = match ? (
+                <Prism
+                  {...rest}
+                  PreTag="div"
+                  children={String(children).replace(/\n$/, '')}
+                  language={match[1]}
+                  style={nord}
+                />
+              ) : (
+                <code {...rest} className={className}>
+                  {children}
+                </code>
+              )
+              return res
+            }
+          }}
+        />
+
       </div>
 
       <div className="flex justify-end">
