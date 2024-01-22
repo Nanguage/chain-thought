@@ -5,7 +5,7 @@ import { sendMessage } from '../utils/chatgptAPI';
 import { Message } from '../types/message';
 
 
-// 请在 .env 文件中设置你的API密钥，例如：REACT_APP_OPENAI_API_KEY=your_api_key_here
+// Please set your API key in .env file, e.g.: VITE_OPENAI_API_KEY=your-api-key
 const default_key = import.meta.env.VITE_OPENAI_API_KEY
 
 
@@ -18,7 +18,7 @@ export const ChatWindow: React.FC = () => {
   const handleSendMessage = async (message: string) => {
     const updatedMessages: Message[] = [
       ...messages,
-      { sender: "user", content: message },
+      { sender: "user", content: message, timestamp: new Date().toLocaleTimeString() },
     ];
 
     setMessages(updatedMessages)
@@ -27,7 +27,7 @@ export const ChatWindow: React.FC = () => {
       const handleMessageReceived = (receivedMessage: string) => {
         console.log(receivedMessage)
         if (receivedMessage === "[start]") {
-          setMessages([...updatedMessages, {sender: 'bot', content: ""}])
+          setMessages([...updatedMessages, {sender: 'bot', content: "", timestamp: new Date().toLocaleTimeString()}])
         } else if (receivedMessage === "[end]") {
           setReply("")
         } else {
@@ -45,7 +45,7 @@ export const ChatWindow: React.FC = () => {
     if (reply) {
       const updatedMessages: Message[] = [
         ...messages.slice(0, messages.length - 1),
-        { sender: "bot", content: reply },
+        { sender: "bot", content: reply, timestamp: new Date().toLocaleTimeString() },
       ];
       setMessages(updatedMessages);
     }
@@ -78,8 +78,7 @@ export const ChatWindow: React.FC = () => {
         {messages.map((message, index) => (
           <ChatMessage
             key={index}
-            message={message.content}
-            sender={message.sender}
+            message={message}
           />
         ))}
         <div ref={messagesEndRef}></div>

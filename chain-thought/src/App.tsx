@@ -1,5 +1,5 @@
 import React from 'react';
-import './index.css'; // 确保引入了 Tailwind CSS
+import './index.css';
 import { ChatWindow } from './components/ChatWindow';
 
 

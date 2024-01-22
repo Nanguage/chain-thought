@@ -1,6 +1,7 @@
 export interface Message {
   sender: 'user' | 'bot';
   content: string;
+  timestamp: string;
 }
 
 export type ChatGPTAgent = "user" | "system" | "assistant";
