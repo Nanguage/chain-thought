@@ -40,7 +40,6 @@ export const ChatWindow: React.FC = () => {
   };
 
   useEffect(() => {
-    console.log("Reply: " + reply + "\n")
     if (reply) {
       const updatedMessages: Message[] = [
         ...messages.slice(0, messages.length - 1),

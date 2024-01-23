@@ -1,7 +1,7 @@
 import React from 'react';
 import { Message } from '../types/message';
 import Markdown from 'react-markdown'
-import { Prism } from 'react-syntax-highlighter'
+import SyntaxHighlighter from 'react-syntax-highlighter';
 import { nord } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 
 import PersonIcon from '@mui/icons-material/Person';
@@ -33,8 +33,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
               const {children, className, node, ...rest} = props
               const match = /language-(\w+)/.exec(className || '')
               const res = match ? (
-                <Prism
-                  {...rest}
+                <SyntaxHighlighter
                   PreTag="div"
                   children={String(children).replace(/\n$/, '')}
                   language={match[1]}
