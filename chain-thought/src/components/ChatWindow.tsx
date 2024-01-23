@@ -5,7 +5,7 @@ import { sendMessage } from '../utils/chatgptAPI';
 import { Message } from '../types/message';
 
 import { useSettingStore } from '../store';
-import Seeting from './Setting';
+import Setting from './Setting';
 
 
 export const ChatWindow: React.FC = () => {
@@ -56,10 +56,8 @@ export const ChatWindow: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full">
-      <Seeting />
-
+      <Setting />
       <hr/>
-
       <div className="flex-grow overflow-y-auto p-4">
         {messages.map((message, index) => (
           <ChatMessage

@@ -19,8 +19,8 @@ const theme = createTheme({
 const App: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>
-      <div className="h-screen bg-gray-100 flex items-stretch md:items-center justify-center">
-        <div id="chatbackground" className="bg-white w-full h-full md:max-w-xl md:h-[800px] rounded-lg shadow-md p-4 flex flex-col">
+      <div className="h-screen bg-gray-100 flex items-stretch md:items-center justify-center md:p-10">
+        <div id="chatbackground" className="bg-white w-full h-full md:max-w-[800px] rounded-lg shadow-md p-4 flex flex-col">
           <ChatWindow />
         </div>
       </div>

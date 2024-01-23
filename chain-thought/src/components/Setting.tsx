@@ -7,7 +7,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import { useSettingStore } from '../store';
 
 
-const Seeting = () => {
+const Setting = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { apiKey, setApiKey } = useSettingStore((state) => state);
 
@@ -40,4 +40,4 @@ const Seeting = () => {
   );
 };
 
-export default Seeting;
+export default Setting;
