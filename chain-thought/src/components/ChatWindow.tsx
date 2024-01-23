@@ -4,15 +4,14 @@ import { ChatMessage } from './ChatMessage';
 import { sendMessage } from '../utils/chatgptAPI';
 import { Message } from '../types/message';
 
-
-// Please set your API key in .env file, e.g.: VITE_OPENAI_API_KEY=your-api-key
-const default_key = import.meta.env.VITE_OPENAI_API_KEY
+import { useSettingStore } from '../store';
+import Seeting from './Setting';
 
 
 export const ChatWindow: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [reply, setReply] = useState<string>("");
-  const [apiKey, setApiKey] = useState(default_key);
+  const { apiKey, setApiKey } = useSettingStore((state) => state);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   const handleMessageReceived = (messages: Message[], recv: string) => {
@@ -57,18 +56,7 @@ export const ChatWindow: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="mb-4">
-        <label htmlFor="apiKey" className="block text-sm font-medium text-gray-700">
-          OpenAI API Key
-        </label>
-        <input
-          id="apiKey"
-          type="password"
-          value={apiKey}
-          onChange={(e) => setApiKey(e.target.value)}
-          className="mt-1 block w-full p-2 border-gray-300 rounded-md"
-        />
-      </div>
+      <Seeting />
 
       <hr/>
 

@@ -3,7 +3,6 @@ import { Message } from '../types/message';
 import Markdown from 'react-markdown'
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { nord } from 'react-syntax-highlighter/dist/esm/styles/hljs';
-
 import PersonIcon from '@mui/icons-material/Person';
 import SmartToySharpIcon from '@mui/icons-material/SmartToySharp';
 
