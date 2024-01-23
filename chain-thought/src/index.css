@@ -11,3 +11,7 @@
   background-color: #888;
   border-radius: 5px;
 }
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
