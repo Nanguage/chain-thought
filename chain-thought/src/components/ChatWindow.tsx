@@ -11,8 +11,9 @@ import Setting from './Setting';
 export const ChatWindow: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [reply, setReply] = useState<string>("");
-  const { apiKey, setApiKey } = useSettingStore((state) => state);
+  const { apiKey, model } = useSettingStore((state) => state);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string>("");
 
   const handleMessageReceived = (messages: Message[], recv: string) => {
     if (recv === "[start]") {
@@ -32,9 +33,11 @@ export const ChatWindow: React.FC = () => {
     ];
     setMessages(updatedMessages)
     try {
-      await sendMessage(updatedMessages, apiKey, (recv) => handleMessageReceived(updatedMessages, recv));
+      await sendMessage(model, updatedMessages, apiKey, (recv) => handleMessageReceived(updatedMessages, recv));
+      setErrorMsg("");
     } catch (error) {
       console.error('Error getting response from ChatGPT:', error);
+      setErrorMsg("" + error as string);
     }
   };
 
@@ -68,6 +71,7 @@ export const ChatWindow: React.FC = () => {
         <div ref={messagesEndRef}></div>
       </div>
       <ChatInput onSubmit={handleSendMessage} />
+      <div className="text-red-500 text-sm">{errorMsg}</div>
     </div>
   );
 };

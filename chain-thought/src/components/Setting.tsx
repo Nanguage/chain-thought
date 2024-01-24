@@ -3,13 +3,22 @@ import { Dialog } from '@mui/material';
 import { DialogTitle, DialogContent } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import SettingsIcon from '@mui/icons-material/Settings';
+import Select from '@mui/material/Select';
+import { MenuItem } from '@mui/material';
+import InputLabel from '@mui/material';
 
 import { useSettingStore } from '../store';
+import { models } from '../constants';
 
 
 const Setting = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { apiKey, setApiKey } = useSettingStore((state) => state);
+  const {
+    apiKey,
+    setApiKey,
+    model,
+    setModel,
+  } = useSettingStore((state) => state);
 
   return (
     <div className="relative">
@@ -25,14 +34,33 @@ const Setting = () => {
       >
         <DialogTitle id="alert-dialog-title">Settings</DialogTitle>
         <DialogContent>
-          <div className='mt-2'></div>
-          <TextField
-            id="apiKey"
-            label="OpenAI API Key"
-            type="password"
-            value={apiKey}
-            onChange={(e) => setApiKey(e.target.value)}
-            > </TextField>
+          <div className='mt-2 flex flex-col gap-2'>
+            <TextField
+              id="apiKey"
+              label="OpenAI API Key"
+              type="password"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              ></TextField>
+            <div>
+              <label id="model-label" className='text-gray-500 text-sm'>
+                Model
+              </label>
+              <Select
+                id="model"
+                labelId="model-label"
+                value={model}
+                onChange={(e) => setModel(e.target.value)}
+                className='w-full'
+                >
+                  {
+                    models.map((model) => (
+                      <MenuItem key="model" value={model}>{model}</MenuItem>
+                    ))
+                  }
+              </Select>
+            </div>
+          </div>
         </DialogContent>
 
       </Dialog>

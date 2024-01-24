@@ -8,6 +8,7 @@ const convertSenderToRole = (sender: 'user' | 'bot'): 'user' | 'assistant' => {
 };
 
 export async function sendMessage(
+  model: string,
   messages: Message[],
   apiKey: string,
   onMessageReceived: (message: string) => void
@@ -18,7 +19,7 @@ export async function sendMessage(
   }));
 
   const stream = await OpenAI("chat", {
-    model: "gpt-3.5-turbo",
+    model: model,
     messages: formattedMessages,
     temperature: 0.8,
     top_p: 1,
@@ -57,5 +58,5 @@ export async function sendMessage(
     }
   }
 
-  readStream();
+  await readStream();
 }
