@@ -5,6 +5,7 @@ import TextField from '@mui/material/TextField';
 import SettingsIcon from '@mui/icons-material/Settings';
 import Select from '@mui/material/Select';
 import { MenuItem } from '@mui/material';
+import Checkbox from '@mui/material/Checkbox';
 
 import { useSettingStore, useStatusStore } from '../store';
 import { models } from '../constants';
@@ -17,6 +18,8 @@ const Setting = () => {
     setApiKey,
     model,
     setModel,
+    mathJax,
+    setMathJax,
   } = useSettingStore((state) => state);
   const { apiKeyError } = useStatusStore((state) => state);
   useEffect(() => {
@@ -39,15 +42,20 @@ const Setting = () => {
       >
         <DialogTitle id="alert-dialog-title">Settings</DialogTitle>
         <DialogContent>
-          <div className='mt-2 flex flex-col gap-2'>
-            <TextField
-              id="apiKey"
-              label="OpenAI API Key"
-              type="password"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              error={apiKeyError}
-              ></TextField>
+          <div className='mt-1 flex flex-col gap-2'>
+            <div>
+              <label id="apiKey-label" className='text-gray-500 text-sm'>
+                API Key
+              </label>
+              <TextField
+                id="apiKey"
+                type="password"
+                value={apiKey}
+                onChange={(e) => setApiKey(e.target.value)}
+                error={apiKeyError}
+                className='w-full'
+                ></TextField>
+            </div>
             <div>
               <label id="model-label" className='text-gray-500 text-sm'>
                 Model
@@ -65,6 +73,15 @@ const Setting = () => {
                     ))
                   }
               </Select>
+            </div>
+            <div>
+              <label id="mathjax-label" className='text-gray-500 text-sm mr-2'>
+                MathJax
+              </label>
+              <Checkbox
+                  value={mathJax}
+                  onChange={(e) => setMathJax(e.target.checked)}
+                />
             </div>
           </div>
         </DialogContent>

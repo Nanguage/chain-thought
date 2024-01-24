@@ -33,8 +33,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSubmit }) => {
           }
         }}
       />
-      <IconButton color="primary">
-        <SendIcon onClick={handleSubmit} />
+      <IconButton color="primary" onClick={handleSubmit}>
+        <SendIcon/>
       </IconButton>
     </div>
   );

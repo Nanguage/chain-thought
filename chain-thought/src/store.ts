@@ -10,6 +10,8 @@ interface SettingProps {
   setApiKey: (apiKey: string) => void;
   model: string;
   setModel: (model: string) => void;
+  mathJax: boolean;
+  setMathJax: (useMathJax: boolean) => void;
 }
 
 export const useSettingStore = create<SettingProps>((set) => ({
@@ -17,6 +19,8 @@ export const useSettingStore = create<SettingProps>((set) => ({
   setApiKey: (apiKey) => set({ apiKey }),
   model: defaultModel,
   setModel: (model) => set({ model }),
+  mathJax: false,
+  setMathJax: (mathJax) => set({ mathJax }),
 }));
 
 

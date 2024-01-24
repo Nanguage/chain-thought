@@ -11,7 +11,7 @@ import Setting from './Setting';
 export const ChatWindow: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [reply, setReply] = useState<string>("");
-  const { apiKey, model } = useSettingStore((state) => state);
+  const { apiKey, model, mathJax } = useSettingStore((state) => state);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const [errorMsg, setErrorMsg] = useState<string>("");
   const { setApiKeyError } = useStatusStore((state) => state);
@@ -61,6 +61,12 @@ export const ChatWindow: React.FC = () => {
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+    if( typeof window?.MathJax !== "undefined"){
+      window.MathJax.typesetClear()
+      if (mathJax) {
+        window.MathJax.typeset()
+      }
     }
   }, [messages]);
 
