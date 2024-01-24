@@ -18,3 +18,14 @@ export const useSettingStore = create<SettingProps>((set) => ({
   model: defaultModel,
   setModel: (model) => set({ model }),
 }));
+
+
+interface StatusProps {
+  apiKeyError: boolean;
+  setApiKeyError: (apiKeyError: boolean) => void;
+}
+
+export const useStatusStore = create<StatusProps>((set) => ({
+  apiKeyError: false,
+  setApiKeyError: (apiKeyError: boolean) => set({ apiKeyError }),
+}));

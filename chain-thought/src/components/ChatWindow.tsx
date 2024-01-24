@@ -4,7 +4,7 @@ import { ChatMessage } from './ChatMessage';
 import { sendMessage } from '../utils/chatgptAPI';
 import { Message } from '../types/message';
 
-import { useSettingStore } from '../store';
+import { useSettingStore, useStatusStore } from '../store';
 import Setting from './Setting';
 
 
@@ -14,6 +14,7 @@ export const ChatWindow: React.FC = () => {
   const { apiKey, model } = useSettingStore((state) => state);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const [errorMsg, setErrorMsg] = useState<string>("");
+  const { setApiKeyError } = useStatusStore((state) => state);
 
   const handleMessageReceived = (messages: Message[], recv: string) => {
     if (recv === "[start]") {
@@ -35,9 +36,15 @@ export const ChatWindow: React.FC = () => {
     try {
       await sendMessage(model, updatedMessages, apiKey, (recv) => handleMessageReceived(updatedMessages, recv));
       setErrorMsg("");
+      setApiKeyError(false);
     } catch (error) {
       console.error('Error getting response from ChatGPT:', error);
-      setErrorMsg("" + error as string);
+      if (error instanceof Error) {
+        setErrorMsg(error.message);
+        if (error.message.toLowerCase().includes('api key')) {
+          setApiKeyError(true);
+        }
+      }
     }
   };
 

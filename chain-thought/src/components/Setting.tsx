@@ -1,13 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog } from '@mui/material';
 import { DialogTitle, DialogContent } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import SettingsIcon from '@mui/icons-material/Settings';
 import Select from '@mui/material/Select';
 import { MenuItem } from '@mui/material';
-import InputLabel from '@mui/material';
 
-import { useSettingStore } from '../store';
+import { useSettingStore, useStatusStore } from '../store';
 import { models } from '../constants';
 
 
@@ -19,6 +18,12 @@ const Setting = () => {
     model,
     setModel,
   } = useSettingStore((state) => state);
+  const { apiKeyError } = useStatusStore((state) => state);
+  useEffect(() => {
+    if (apiKeyError) {
+      setIsOpen(true);
+    }
+  }, [apiKeyError]);
 
   return (
     <div className="relative">
@@ -41,6 +46,7 @@ const Setting = () => {
               type="password"
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
+              error={apiKeyError}
               ></TextField>
             <div>
               <label id="model-label" className='text-gray-500 text-sm'>
