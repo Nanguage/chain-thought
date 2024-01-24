@@ -8,6 +8,14 @@ import { useSettingStore, useStatusStore } from '../store';
 import Setting from './Setting';
 
 
+function flushMathJax() {
+  if( typeof window?.MathJax !== "undefined"){
+    window.MathJax.typesetClear()
+    window.MathJax.typeset()
+  }
+}
+
+
 export const ChatWindow: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [reply, setReply] = useState<string>("");
@@ -21,6 +29,9 @@ export const ChatWindow: React.FC = () => {
       setMessages([...messages, {sender: 'bot', content: "", timestamp: new Date().toLocaleTimeString()}])
     } else if (recv === "[end]") {
       setReply("")
+      if (mathJax) {
+        flushMathJax();
+      }
     } else {
       console.log(recv)
       setReply((prev) => prev.concat(recv))
@@ -33,6 +44,9 @@ export const ChatWindow: React.FC = () => {
       { sender: "user", content: message, timestamp: new Date().toLocaleTimeString() },
     ];
     setMessages(updatedMessages)
+    if (mathJax) {
+      flushMathJax();
+    }
     try {
       await sendMessage(model, updatedMessages, apiKey, (recv) => handleMessageReceived(updatedMessages, recv));
       setErrorMsg("");
@@ -62,13 +76,13 @@ export const ChatWindow: React.FC = () => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-    if( typeof window?.MathJax !== "undefined"){
-      window.MathJax.typesetClear()
-      if (mathJax) {
-        window.MathJax.typeset()
-      }
-    }
   }, [messages]);
+
+  useEffect(() => {
+    if (mathJax) {
+      flushMathJax();
+    }
+  }, [mathJax])
 
   return (
     <div className="flex flex-col h-full">

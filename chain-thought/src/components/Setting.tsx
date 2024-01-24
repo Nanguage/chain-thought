@@ -79,8 +79,8 @@ const Setting = () => {
                 MathJax
               </label>
               <Checkbox
-                  value={mathJax}
-                  onChange={(e) => setMathJax(e.target.checked)}
+                checked={mathJax}
+                onChange={(e) => setMathJax(e.target.checked)}
                 />
             </div>
           </div>
