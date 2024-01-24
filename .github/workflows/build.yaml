@@ -1,0 +1,30 @@
+name: Build and Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+  
+    steps:
+    - name: Checkout Source
+      uses: actions/checkout@v2
+  
+    - name: Install Dependencies
+      run: yarn install
+      working-directory: ./chain-thought
+  
+    - name: Build Project
+      run: yarn build
+      working-directory: ./chain-thought
+      env:
+        CI: false
+      
+    - name: Deploy to GitHub Pages
+      uses: JamesIves/github-pages-deploy-action@4.1.4
+      with:
+        branch: gh-pages
+        folder: chain-thought/build
