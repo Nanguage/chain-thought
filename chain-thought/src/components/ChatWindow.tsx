@@ -22,16 +22,18 @@ export const ChatWindow: React.FC = () => {
   const { apiKey, model, mathJax } = useSettingStore((state) => state);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const [errorMsg, setErrorMsg] = useState<string>("");
-  const { setApiKeyError } = useStatusStore((state) => state);
+  const { setApiKeyError, setGenerating } = useStatusStore((state) => state);
 
   const handleMessageReceived = (messages: Message[], recv: string) => {
     if (recv === "[start]") {
+      setGenerating(true)
       setMessages([...messages, {sender: 'bot', content: "", timestamp: new Date().toLocaleTimeString()}])
     } else if (recv === "[end]") {
       setReply("")
       if (mathJax) {
         flushMathJax();
       }
+      setGenerating(false)
     } else {
       console.log(recv)
       setReply((prev) => prev.concat(recv))

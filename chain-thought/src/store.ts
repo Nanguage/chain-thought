@@ -27,9 +27,13 @@ export const useSettingStore = create<SettingProps>((set) => ({
 interface StatusProps {
   apiKeyError: boolean;
   setApiKeyError: (apiKeyError: boolean) => void;
+  generating: boolean;
+  setGenerating: (generating: boolean) => void;
 }
 
 export const useStatusStore = create<StatusProps>((set) => ({
   apiKeyError: false,
-  setApiKeyError: (apiKeyError: boolean) => set({ apiKeyError }),
+  setApiKeyError: (apiKeyError) => set({ apiKeyError }),
+  generating: false,
+  setGenerating: (generating) => set({ generating }),
 }));

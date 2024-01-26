@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { IconButton, TextField } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
+import { useStatusStore } from '../store';
 
 interface ChatInputProps {
   onSubmit: (message: string) => void;
@@ -8,6 +9,7 @@ interface ChatInputProps {
 
 export const ChatInput: React.FC<ChatInputProps> = ({ onSubmit }) => {
   const [message, setMessage] = useState('');
+  const { generating } = useStatusStore((state) => state);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,12 +30,12 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSubmit }) => {
         multiline
         onKeyDown={(e) => {
           console.log(e.key);
-          if (e.key === 'Enter' && !e.shiftKey) {
+          if (e.key === 'Enter' && !e.shiftKey && !generating) {
             handleSubmit(e);
           }
         }}
       />
-      <IconButton color="primary" onClick={handleSubmit}>
+      <IconButton color="primary" onClick={handleSubmit} disabled={generating}>
         <SendIcon/>
       </IconButton>
     </div>
