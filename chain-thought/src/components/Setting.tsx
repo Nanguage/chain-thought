@@ -45,7 +45,10 @@ const Setting = () => {
           <div className='mt-1 flex flex-col gap-2'>
             <div>
               <label id="apiKey-label" className='text-gray-500 text-sm'>
-                API Key
+                OpenAI API Key
+              </label>
+              <label className='text-gray-400 text-sm ml-1'>
+                (See help <a className="underline" href="https://help.openai.com/en/articles/4936850-where-do-i-find-my-api-key">here</a>)
               </label>
               <TextField
                 id="apiKey"
