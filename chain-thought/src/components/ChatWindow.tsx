@@ -2,9 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ChatInput } from './ChatInput';
 import { ChatMessage } from './ChatMessage';
 import { sendMessage } from '../utils/chatgptAPI';
-import { Message } from '../types/message';
+import { Message } from '../types';
 
-import { useSettingStore, useStatusStore } from '../store';
+import { useSettingStore, useStatusStore, useHistoryStore } from '../store';
 import Setting from './Setting';
 
 
@@ -17,7 +17,7 @@ function flushMathJax() {
 
 
 export const ChatWindow: React.FC = () => {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const { messages, addMessage, setLastMessage } = useHistoryStore((state) => state);
   const [reply, setReply] = useState<string>("");
   const { apiKey, model, mathJax } = useSettingStore((state) => state);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -27,7 +27,7 @@ export const ChatWindow: React.FC = () => {
   const handleMessageReceived = (messages: Message[], recv: string) => {
     if (recv === "[start]") {
       setGenerating(true)
-      setMessages([...messages, {sender: 'bot', content: "", timestamp: new Date().toLocaleTimeString()}])
+      addMessage({sender: 'bot', content: "", timestamp: new Date().toLocaleTimeString()})
     } else if (recv === "[end]") {
       setReply("")
       if (mathJax) {
@@ -41,40 +41,39 @@ export const ChatWindow: React.FC = () => {
   };
 
   const handleSendMessage = async (message: string) => {
-    const updatedMessages: Message[] = [
-      ...messages,
-      { sender: "user", content: message, timestamp: new Date().toLocaleTimeString() },
-    ];
-    setMessages(updatedMessages)
-    if (mathJax) {
-      flushMathJax();
-    }
-    try {
-      await sendMessage(model, updatedMessages, apiKey, (recv) => handleMessageReceived(updatedMessages, recv));
-      setErrorMsg("");
-      setApiKeyError(false);
-    } catch (error) {
-      console.error('Error getting response from ChatGPT:', error);
-      if (error instanceof Error) {
-        setErrorMsg(error.message);
-        if (error.message.toLowerCase().includes('api key')) {
-          setApiKeyError(true);
-        }
-      }
-    }
+    addMessage({sender: 'user', content: message, timestamp: new Date().toLocaleTimeString()})
   };
 
   useEffect(() => {
     if (reply) {
-      const updatedMessages: Message[] = [
-        ...messages.slice(0, messages.length - 1),
-        { sender: "bot", content: reply, timestamp: new Date().toLocaleTimeString() },
-      ];
-      setMessages(updatedMessages);
+      setLastMessage({ sender: "bot", content: reply, timestamp: new Date().toLocaleTimeString()});
     }
   }, [reply])
 
   useEffect(() => {
+    const lastMessage = messages[messages.length - 1];
+    if (lastMessage && lastMessage.sender === 'user') {
+      if (mathJax) {
+        flushMathJax();
+      }
+      try {
+        console.log(messages)
+        const p = sendMessage(model, messages, apiKey, (recv) => handleMessageReceived(messages, recv));
+        p.then((res) => {
+          console.log(res)
+          setErrorMsg("");
+          setApiKeyError(false);
+        })
+      } catch (error) {
+        console.error('Error getting response from ChatGPT:', error);
+        if (error instanceof Error) {
+          setErrorMsg(error.message);
+          if (error.message.toLowerCase().includes('api key')) {
+            setApiKeyError(true);
+          }
+        }
+      }
+    }
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }

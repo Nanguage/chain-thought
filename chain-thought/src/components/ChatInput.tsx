@@ -29,7 +29,6 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSubmit }) => {
         placeholder="Type here, Enter to send, Shift+Enter to new line."
         multiline
         onKeyDown={(e) => {
-          console.log(e.key);
           if (e.key === 'Enter' && !e.shiftKey && !generating) {
             handleSubmit(e);
           }

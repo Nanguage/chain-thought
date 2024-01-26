@@ -1,5 +1,5 @@
-import { Message } from '../types/message';
-import { ChatGPTMessage } from "../types/message";
+import { Message } from '../types';
+import { ChatGPTMessage } from "../types";
 import { OpenAI } from "openai-streams";
 
 
