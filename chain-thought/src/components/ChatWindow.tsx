@@ -56,23 +56,19 @@ export const ChatWindow: React.FC = () => {
       if (mathJax) {
         flushMathJax();
       }
-      try {
-        console.log(messages)
-        const p = sendMessage(model, messages, apiKey, (recv) => handleMessageReceived(messages, recv));
-        p.then((res) => {
-          console.log(res)
-          setErrorMsg("");
-          setApiKeyError(false);
-        })
-      } catch (error) {
-        console.error('Error getting response from ChatGPT:', error);
-        if (error instanceof Error) {
-          setErrorMsg(error.message);
-          if (error.message.toLowerCase().includes('api key')) {
-            setApiKeyError(true);
-          }
+      console.log(messages)
+      const p = sendMessage(model, messages, apiKey, (recv) => handleMessageReceived(messages, recv));
+      p.then((res) => {
+        console.log(res)
+        setErrorMsg("");
+        setApiKeyError(false);
+      }).catch((err) => {
+        console.log(err)
+        setErrorMsg(err.message);
+        if (err.message.toLowerCase().includes('api key')) {
+          setApiKeyError(true);
         }
-      }
+      });
     }
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
