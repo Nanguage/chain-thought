@@ -1,5 +1,6 @@
 import { create } from "zustand";
-import { Message } from "./types";
+import { Message, HistoryLine } from "./types";
+import { getLastNode } from "./utils";
 
 // Please set your API key in .env file, e.g.: VITE_OPENAI_API_KEY=your-api-key
 const defaultApiKey = import.meta.env.VITE_OPENAI_API_KEY;
@@ -41,15 +42,50 @@ export const useStatusStore = create<StatusProps>((set) => ({
 
 
 interface HistoryProps {
-  messages: Message[];
-  addMessage: (message: Message) => void;
+  root: HistoryLine;
+  addNewLine: (message: Message) => void;
   setLastMessage: (message: Message) => void;
-  clearMessages: () => void;
 }
 
+
 export const useHistoryStore = create<HistoryProps>((set) => ({
-  messages: [],
-  addMessage: (message) => set((state) => ({ messages: [...state.messages, message] })),
-  setLastMessage: (message) => set((state) => ({ messages: [...state.messages.slice(0, -1), message] })),
-  clearMessages: () => set({ messages: [] }),
+  root: {
+    nodes: [],
+    currentIndex: -1,
+  },
+  addNewLine: (message) => set(state => {
+    if (state.root.currentIndex < 0) {
+      return {
+        root: {
+          nodes: [{ message, next: null }],
+          currentIndex: 0,
+        }
+      }
+    } else {
+      const newRoot = Object.assign({}, state.root);
+      const lastNode = getLastNode(newRoot);
+      const newLine = { nodes: [{ message, next: null }], currentIndex: 0 };
+      lastNode.next = newLine;
+      return {
+        root: newRoot
+      }
+    }
+  }),
+  setLastMessage: (message) => set(state => {
+    if (state.root.currentIndex < 0) {
+      return {
+        root: {
+          nodes: [{ message, next: null }],
+          currentIndex: 0,
+        }
+      }
+    } else {
+      const newRoot = Object.assign({}, state.root);
+      const lastNode = getLastNode(newRoot);
+      lastNode.message = message;
+      return {
+        root: newRoot
+      }
+    }
+  }),
 }));

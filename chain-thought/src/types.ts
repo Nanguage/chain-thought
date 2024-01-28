@@ -4,9 +4,19 @@ export interface Message {
   timestamp: string;
 }
 
-export type ChatGPTAgent = "user" | "system" | "assistant";
+export type ChatRole = "user" | "system" | "assistant";
 
 export interface ChatGPTMessage {
-  role: ChatGPTAgent;
+  role: ChatRole;
   content: string;
+}
+
+export interface HistoryNode {
+  message: Message;
+  next: HistoryLine | null;
+}
+
+export interface HistoryLine {
+  nodes: HistoryNode[];
+  currentIndex: number;
 }

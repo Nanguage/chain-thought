@@ -3,6 +3,7 @@ import { ChatInput } from './ChatInput';
 import { ChatMessage } from './ChatMessage';
 import { sendMessage } from '../utils/chatgptAPI';
 import { Message } from '../types';
+import { getLinearMessages } from '../utils';
 
 import { useSettingStore, useStatusStore, useHistoryStore } from '../store';
 import Setting from './Setting';
@@ -17,7 +18,8 @@ function flushMathJax() {
 
 
 export const ChatWindow: React.FC = () => {
-  const { messages, addMessage, setLastMessage } = useHistoryStore((state) => state);
+  const { root, addNewLine, setLastMessage } = useHistoryStore((state) => state);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [reply, setReply] = useState<string>("");
   const { apiKey, model, mathJax } = useSettingStore((state) => state);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -27,7 +29,7 @@ export const ChatWindow: React.FC = () => {
   const handleMessageReceived = (messages: Message[], recv: string) => {
     if (recv === "[start]") {
       setGenerating(true)
-      addMessage({sender: 'bot', content: "", timestamp: new Date().toLocaleTimeString()})
+      addNewLine({sender: 'bot', content: "", timestamp: new Date().toLocaleTimeString()})
     } else if (recv === "[end]") {
       setReply("")
       if (mathJax) {
@@ -41,7 +43,7 @@ export const ChatWindow: React.FC = () => {
   };
 
   const handleSendMessage = async (message: string) => {
-    addMessage({sender: 'user', content: message, timestamp: new Date().toLocaleTimeString()})
+    addNewLine({sender: 'user', content: message, timestamp: new Date().toLocaleTimeString()})
   };
 
   useEffect(() => {
@@ -49,6 +51,10 @@ export const ChatWindow: React.FC = () => {
       setLastMessage({ sender: "bot", content: reply, timestamp: new Date().toLocaleTimeString()});
     }
   }, [reply])
+
+  useEffect(() => {
+    setMessages(getLinearMessages(root));
+  }, [root]);
 
   useEffect(() => {
     const lastMessage = messages[messages.length - 1];
