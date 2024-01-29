@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import { Message, HistoryLine } from "./types";
-import { getLastNode } from "./utils";
 
 // Please set your API key in .env file, e.g.: VITE_OPENAI_API_KEY=your-api-key
 const defaultApiKey = import.meta.env.VITE_OPENAI_API_KEY;
@@ -43,49 +42,61 @@ export const useStatusStore = create<StatusProps>((set) => ({
 
 interface HistoryProps {
   root: HistoryLine;
+  last: HistoryLine;
   addNewLine: (message: Message) => void;
   setLastMessage: (message: Message) => void;
 }
 
 
-export const useHistoryStore = create<HistoryProps>((set) => ({
-  root: {
+export const useHistoryStore = create<HistoryProps>((set) => {
+  const root = {
     nodes: [],
     currentIndex: -1,
-  },
-  addNewLine: (message) => set(state => {
-    if (state.root.currentIndex < 0) {
-      return {
-        root: {
+  }
+  return {
+    root: root,
+    last: root,
+
+    addNewLine: (message) => set(state => {
+      if (state.root.currentIndex < 0) {
+        const newRoot = {
           nodes: [{ message, next: null }],
           currentIndex: 0,
         }
+        return {
+          root: newRoot,
+          last: newRoot,
+        }
+      } else {
+        const newRoot = Object.assign({}, state.root);
+        const lastNode = state.last.nodes[state.last.currentIndex];
+        const newLine = { nodes: [{ message, next: null }], currentIndex: 0 };
+        lastNode.next = newLine;
+        return {
+          root: newRoot,
+          last: newLine,
+        }
       }
-    } else {
-      const newRoot = Object.assign({}, state.root);
-      const lastNode = getLastNode(newRoot);
-      const newLine = { nodes: [{ message, next: null }], currentIndex: 0 };
-      lastNode.next = newLine;
-      return {
-        root: newRoot
-      }
-    }
-  }),
-  setLastMessage: (message) => set(state => {
-    if (state.root.currentIndex < 0) {
-      return {
-        root: {
+    }),
+
+    setLastMessage: (message) => set(state => {
+      if (state.root.currentIndex < 0) {
+        const newRoot = {
           nodes: [{ message, next: null }],
           currentIndex: 0,
         }
+        return {
+          root: newRoot,
+          last: newRoot,
+        }
+      } else {
+        const newRoot = Object.assign({}, state.root);
+        const lastNode = state.last.nodes[state.last.currentIndex];
+        lastNode.message = message;
+        return {
+          root: newRoot,
+          last: state.last,
+        }
       }
-    } else {
-      const newRoot = Object.assign({}, state.root);
-      const lastNode = getLastNode(newRoot);
-      lastNode.message = message;
-      return {
-        root: newRoot
-      }
-    }
-  }),
-}));
+    }),
+}});

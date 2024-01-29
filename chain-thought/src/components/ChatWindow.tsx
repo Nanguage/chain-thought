@@ -3,7 +3,7 @@ import { ChatInput } from './ChatInput';
 import { ChatLine } from './ChatLine';
 import { sendMessage } from '../utils/chatgptAPI';
 import { HistoryLine } from '../types';
-import { getLinearLines, getLinesMessages } from '../utils';
+import { getLinearLines, getLinesMessages } from '../utils/history';
 
 import { useSettingStore, useStatusStore, useHistoryStore } from '../store';
 import Setting from './Setting';

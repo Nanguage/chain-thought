@@ -1,4 +1,4 @@
-import { HistoryLine, HistoryNode, Message } from "./types";
+import { HistoryLine, HistoryNode, Message } from "../types";
 
 
 export function getLastNode(root: HistoryLine): HistoryNode {
