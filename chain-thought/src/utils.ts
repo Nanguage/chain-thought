@@ -31,6 +31,6 @@ export function getLinearLines(root: HistoryLine): HistoryLine[] {
 }
 
 
-export function getLinearMessages(root: HistoryLine): Message[] {
-  return getLinearLines(root).map(line => line.nodes[line.currentIndex].message);
+export function getLinesMessages(lines: HistoryLine[]): Message[] {
+  return lines.map(line => line.nodes[line.currentIndex].message);
 }

@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ChatInput } from './ChatInput';
-import { ChatMessage } from './ChatMessage';
+import { ChatLine } from './ChatLine';
 import { sendMessage } from '../utils/chatgptAPI';
-import { Message } from '../types';
-import { getLinearMessages } from '../utils';
+import { HistoryLine } from '../types';
+import { getLinearLines, getLinesMessages } from '../utils';
 
 import { useSettingStore, useStatusStore, useHistoryStore } from '../store';
 import Setting from './Setting';
@@ -19,14 +19,14 @@ function flushMathJax() {
 
 export const ChatWindow: React.FC = () => {
   const { root, addNewLine, setLastMessage } = useHistoryStore((state) => state);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [lines, setLines] = useState<HistoryLine[]>([]);
   const [reply, setReply] = useState<string>("");
   const { apiKey, model, mathJax } = useSettingStore((state) => state);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const [errorMsg, setErrorMsg] = useState<string>("");
   const { setApiKeyError, setGenerating } = useStatusStore((state) => state);
 
-  const handleMessageReceived = (messages: Message[], recv: string) => {
+  const handleMessageReceived = (recv: string) => {
     if (recv === "[start]") {
       setGenerating(true)
       addNewLine({sender: 'bot', content: "", timestamp: new Date().toLocaleTimeString()})
@@ -53,17 +53,18 @@ export const ChatWindow: React.FC = () => {
   }, [reply])
 
   useEffect(() => {
-    setMessages(getLinearMessages(root));
+    setLines(getLinearLines(root));
   }, [root]);
 
   useEffect(() => {
+    const messages = getLinesMessages(lines);
     const lastMessage = messages[messages.length - 1];
     if (lastMessage && lastMessage.sender === 'user') {
       if (mathJax) {
         flushMathJax();
       }
       console.log(messages)
-      const p = sendMessage(model, messages, apiKey, (recv) => handleMessageReceived(messages, recv));
+      const p = sendMessage(model, messages, apiKey, (recv) => handleMessageReceived(recv));
       p.then((res) => {
         console.log(res)
         setErrorMsg("");
@@ -79,7 +80,7 @@ export const ChatWindow: React.FC = () => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages]);
+  }, [lines]);
 
   useEffect(() => {
     if (mathJax) {
@@ -92,10 +93,10 @@ export const ChatWindow: React.FC = () => {
       <Setting />
       <hr/>
       <div className="flex-grow overflow-y-auto p-4">
-        {messages.map((message, index) => (
-          <ChatMessage
+        {lines.map((line, index) => (
+          <ChatLine
             key={index}
-            message={message}
+            historyLine={line}
           />
         ))}
         <div ref={messagesEndRef}></div>

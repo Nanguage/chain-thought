@@ -71,8 +71,8 @@ const Setting = () => {
                 className='w-full'
                 >
                   {
-                    models.map((model) => (
-                      <MenuItem key="model" value={model}>{model}</MenuItem>
+                    models.map((model, idx) => (
+                      <MenuItem key={idx} value={model}>{model}</MenuItem>
                     ))
                   }
               </Select>
