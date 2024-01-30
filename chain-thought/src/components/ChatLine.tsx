@@ -6,6 +6,7 @@ import SmartToySharpIcon from '@mui/icons-material/SmartToySharp';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import EditIcon from '@mui/icons-material/Edit';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import { useSnackbar } from 'notistack';
 
 interface ChatLineProps {
   historyLine: HistoryLine;
@@ -17,6 +18,12 @@ export const ChatLine: React.FC<ChatLineProps> = ({ historyLine }) => {
   const message = currentNode.message;
   const iconClassname = "text-gray-600 hover:text-gray-800 hover:cursor-pointer"
   const iconSize = 18;
+  const { enqueueSnackbar } = useSnackbar();
+
+  const handleCopy = () => {
+    enqueueSnackbar('Copied to clipboard');
+    navigator.clipboard.writeText(message.content)
+  }
 
   return (
     <div
@@ -39,7 +46,9 @@ export const ChatLine: React.FC<ChatLineProps> = ({ historyLine }) => {
                   <div className='absolute top-0 w-10 flex'>
                     <ContentCopyIcon
                       className={iconClassname}
-                      sx={{height: iconSize - 2}}/>
+                      sx={{height: iconSize - 2}}
+                      onClick={handleCopy}
+                      />
                     <RefreshIcon
                       className={iconClassname}
                       sx={{height: iconSize + 1}}/>

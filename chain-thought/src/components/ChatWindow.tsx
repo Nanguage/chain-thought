@@ -4,6 +4,7 @@ import { ChatLine } from './ChatLine';
 import { sendMessage } from '../utils/chatgptAPI';
 import { HistoryLine } from '../types';
 import { getLinearLines, getLinesMessages } from '../utils/history';
+import { useSnackbar } from 'notistack';
 
 import { useSettingStore, useStatusStore, useHistoryStore } from '../store';
 import Setting from './Setting';
@@ -23,7 +24,7 @@ export const ChatWindow: React.FC = () => {
   const [reply, setReply] = useState<string>("");
   const { apiKey, model, mathJax } = useSettingStore((state) => state);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
-  const [errorMsg, setErrorMsg] = useState<string>("");
+  const { enqueueSnackbar } = useSnackbar();
   const { setApiKeyError, setGenerating } = useStatusStore((state) => state);
 
   const handleMessageReceived = (recv: string) => {
@@ -67,14 +68,15 @@ export const ChatWindow: React.FC = () => {
       const p = sendMessage(model, messages, apiKey, (recv) => handleMessageReceived(recv));
       p.then((res) => {
         console.log(res)
-        setErrorMsg("");
         setApiKeyError(false);
       }).catch((err) => {
         console.log(err)
-        setErrorMsg(err.message);
+        let errMsg = "Some error occurred during the request."
         if (err.message.toLowerCase().includes('api key')) {
           setApiKeyError(true);
+          errMsg = "Invalid API key."
         }
+        enqueueSnackbar(errMsg, { variant: 'error' });
       });
     }
     if (messagesEndRef.current) {
@@ -102,7 +104,6 @@ export const ChatWindow: React.FC = () => {
         <div ref={messagesEndRef}></div>
       </div>
       <ChatInput onSubmit={handleSendMessage} />
-      <div className="text-red-500 text-sm">{errorMsg}</div>
     </div>
   );
 };
