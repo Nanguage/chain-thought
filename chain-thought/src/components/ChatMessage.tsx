@@ -16,6 +16,33 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
   const messageClass = message.sender === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-300';
   const [editing, setEditing] = React.useState(false);
 
+  const msgComp = React.useMemo(() => {
+    return (
+      <Markdown
+        children={message.content}
+        components={{
+          code(props) {
+            const {children, className, node, ...rest} = props
+            const match = /language-(\w+)/.exec(className || '')
+            const res = match ? (
+              <SyntaxHighlighter
+                PreTag="div"
+                children={String(children).replace(/\n$/, '')}
+                language={match[1]}
+                style={nord}
+              />
+            ) : (
+              <code {...rest} className={className}>
+                {children}
+              </code>
+            )
+            return res
+          }
+        }}
+      />
+    );
+  }, [message.content]);
+
   return (
     <div>
       <div className="flex items-center">
@@ -32,28 +59,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
               {message.content}
             </div>
           ) : (
-            <Markdown
-              children={message.content}
-              components={{
-                code(props) {
-                  const {children, className, node, ...rest} = props
-                  const match = /language-(\w+)/.exec(className || '')
-                  const res = match ? (
-                    <SyntaxHighlighter
-                      PreTag="div"
-                      children={String(children).replace(/\n$/, '')}
-                      language={match[1]}
-                      style={nord}
-                    />
-                  ) : (
-                    <code {...rest} className={className}>
-                      {children}
-                    </code>
-                  )
-                  return res
-                }
-              }}
-            />
+            msgComp
           )
         }
 
