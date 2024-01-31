@@ -37,6 +37,9 @@ export const ChatWindow: React.FC = () => {
         flushMathJax();
       }
       setGenerating(false)
+      if (messagesEndRef.current) {
+        messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
     } else {
       console.log(recv)
       appendLastMessage(recv);
@@ -74,9 +77,6 @@ export const ChatWindow: React.FC = () => {
         enqueueSnackbar(errMsg, { variant: 'error' });
       });
       setReGenerating(false);
-    }
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [lines]);
 

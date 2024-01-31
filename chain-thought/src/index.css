@@ -16,3 +16,37 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
+.text-white * {
+  color: #fff !important;
+}
+
+.prose {
+  max-width: 100%;
+  line-height: 1.5;
+}
+
+.prose pre {
+  padding: 0;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.prose li {
+  margin-top: 0;
+  margin-bottom: 0;
+
+}
+
+.prose :where(p):not(:where([class~="not-prose"],[class~="not-prose"] *)) {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.prose :where(.prose > :last-child):not(:where([class~="not-prose"],[class~="not-prose"] *)) {
+  margin-bottom: 0;
+}
+
+.prose :where(.prose > :first-child):not(:where([class~="not-prose"],[class~="not-prose"] *)) {
+  margin-top: 0;
+}

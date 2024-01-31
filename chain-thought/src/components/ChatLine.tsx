@@ -57,6 +57,7 @@ export const ChatLine: React.FC<ChatLineProps> = ({ historyLine }) => {
   const { enqueueSnackbar } = useSnackbar();
   const { refresh, setLastLine } = useHistoryStore();
   const { setReGenerating } = useStatusStore();
+  const [editing, setEditing] = React.useState(false);
 
   const handleCopy = () => {
     enqueueSnackbar('Copied to clipboard');
@@ -89,7 +90,7 @@ export const ChatLine: React.FC<ChatLineProps> = ({ historyLine }) => {
           {message.sender}
         </div>
       </div>
-      <ChatMessage message={message} />
+      <ChatMessage message={message} editing={editing} />
       <div className={"flex mb-1 justify-between"}>
         {
           hover ? (
