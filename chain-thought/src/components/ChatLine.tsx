@@ -8,8 +8,11 @@ import EditIcon from '@mui/icons-material/Edit';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import CheckIcon from '@mui/icons-material/Check';
+import CloseIcon from '@mui/icons-material/Close';
 import { useSnackbar } from 'notistack';
 import { useHistoryStore, useStatusStore } from '../store';
+import { getLinearLines } from '../utils/history';
 
 
 const iconSize = 18;
@@ -17,7 +20,11 @@ const iconClassname = "text-gray-600 hover:text-gray-800 hover:cursor-pointer"
 
 
 const NodeSwitcher: React.FC<{historyLine: HistoryLine}> = ({ historyLine }) => {
-  const { refresh } = useHistoryStore();
+  const { root, refresh, setLastLine } = useHistoryStore();
+  const setLast = () => {
+    const lines = getLinearLines(root)
+    setLastLine(lines[lines.length - 1])
+  }
 
   return (
     <div className="flex justify-center">
@@ -29,6 +36,7 @@ const NodeSwitcher: React.FC<{historyLine: HistoryLine}> = ({ historyLine }) => 
             historyLine.currentIndex -= 1;
           }
           refresh();
+          setLast();
         }}
       />
       <div className="w-8 text-sm text-gray-600 text-center">{`${historyLine.currentIndex + 1} / ${historyLine.nodes.length}`}</div>
@@ -40,6 +48,7 @@ const NodeSwitcher: React.FC<{historyLine: HistoryLine}> = ({ historyLine }) => 
             historyLine.currentIndex += 1;
           }
           refresh();
+          setLast();
         }}
       />
     </div>
@@ -58,6 +67,7 @@ export const ChatLine: React.FC<ChatLineProps> = ({ historyLine }) => {
   const { refresh, setLastLine } = useHistoryStore();
   const { setReGenerating } = useStatusStore();
   const [editing, setEditing] = React.useState(false);
+  const [newContent, setNewContent] = React.useState("");
 
   const handleCopy = () => {
     enqueueSnackbar('Copied to clipboard');
@@ -79,6 +89,84 @@ export const ChatLine: React.FC<ChatLineProps> = ({ historyLine }) => {
     refresh();
   }
 
+  const handleStartEditing = () => {
+    setEditing(true);
+    setNewContent(message.content);
+  }
+
+  const handleFinishEditing = () => {
+    if (newContent === message.content) {
+      setEditing(false);
+      return;
+    }
+    setEditing(false);
+    historyLine.nodes.push({
+      message: {
+        sender: 'user',
+        content: newContent,
+        timestamp: new Date().toLocaleTimeString()
+      },
+      next: null
+    })
+    historyLine.currentIndex = historyLine.nodes.length - 1;
+    setLastLine(historyLine);
+    refresh();
+  }
+
+  const switcher = () => {
+    if (historyLine.nodes.length > 1) {
+      return (
+        <NodeSwitcher historyLine={historyLine}/>
+      )
+    }
+  }
+
+  const userIcons = () => {
+    if (editing) {
+      return (
+        <>
+          <CheckIcon
+            className={iconClassname}
+            sx={{height: iconSize}}
+            onClick={handleFinishEditing}
+          />
+          <CloseIcon
+            className={iconClassname}
+            sx={{height: iconSize}}
+            onClick={() => setEditing(false)}
+          />
+        </>
+      )
+    } else {
+      return <>
+        {switcher()}
+        <EditIcon
+          className={iconClassname}
+          sx={{height: iconSize}}
+          onClick={handleStartEditing}
+        />
+      </>
+    }
+  }
+
+  const botIcons = () => {
+    return (
+      <>
+        {switcher()}
+        <ContentCopyIcon
+          className={iconClassname+ " pt-0.5"}
+          sx={{height: iconSize - 2}}
+          onClick={handleCopy}
+          />
+        <RefreshIcon
+          className={iconClassname}
+          sx={{height: iconSize + 1}}
+          onClick={reGenerateRequest}
+          />
+      </>
+    )
+  }
+
   return (
     <div
       onMouseEnter={() => setHover(true)}
@@ -90,39 +178,15 @@ export const ChatLine: React.FC<ChatLineProps> = ({ historyLine }) => {
           {message.sender}
         </div>
       </div>
-      <ChatMessage message={message} editing={editing} />
+      <ChatMessage message={message} editing={editing} setNewContent={setNewContent}/>
       <div className={"flex mb-1 justify-between"}>
         {
           hover ? (
             <div className='relative'>
-              {
-                message.sender === 'bot' ? (
-                  <div className='absolute top-0 w-10 flex'>
-                    {
-                      historyLine.nodes.length > 1 ?  (
-                        <NodeSwitcher historyLine={historyLine}/>
-                      ) : null
-                    }
-                    <ContentCopyIcon
-                      className={iconClassname+ " pt-0.5"}
-                      sx={{height: iconSize - 2}}
-                      onClick={handleCopy}
-                      />
-                    <RefreshIcon
-                      className={iconClassname}
-                      sx={{height: iconSize + 1}}
-                      onClick={reGenerateRequest}
-                      />
-                  </div>
-                ) : null
-              }
-              {
-                message.sender === 'user' ? (
-                  <EditIcon
-                    className={"absolute top-0 " + iconClassname}
-                    sx={{height: iconSize}}/>
-                ) : null
-              }
+              <div className='absolute top-0 w-10 flex'>
+                { message.sender === 'bot' ? botIcons() : null }
+                { message.sender === 'user' ? userIcons() : null }
+              </div>
             </div>
           ) : <div></div>
         }

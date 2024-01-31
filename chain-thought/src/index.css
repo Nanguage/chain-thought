@@ -38,6 +38,20 @@
 
 }
 
+.prose h1 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.prose h2 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+.prose ul {
+  margin-top: 0.5rem;
+}
+
 .prose :where(p):not(:where([class~="not-prose"],[class~="not-prose"] *)) {
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
