@@ -6,8 +6,45 @@ import SmartToySharpIcon from '@mui/icons-material/SmartToySharp';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import EditIcon from '@mui/icons-material/Edit';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import { useSnackbar } from 'notistack';
 import { useHistoryStore, useStatusStore } from '../store';
+
+
+const iconSize = 18;
+const iconClassname = "text-gray-600 hover:text-gray-800 hover:cursor-pointer"
+
+
+const NodeSwitcher: React.FC<{historyLine: HistoryLine}> = ({ historyLine }) => {
+  const { refresh } = useHistoryStore();
+
+  return (
+    <div className="flex justify-center">
+      <ChevronLeftIcon
+        className={iconClassname}
+        sx={{height: iconSize}}
+        onClick={() => {
+          if (historyLine.currentIndex > 0) {
+            historyLine.currentIndex -= 1;
+          }
+          refresh();
+        }}
+      />
+      <div className="w-8 text-sm text-gray-600 text-center">{`${historyLine.currentIndex + 1} / ${historyLine.nodes.length}`}</div>
+      <ChevronRightIcon
+        className={iconClassname}
+        sx={{height: iconSize}}
+        onClick={() => {
+          if (historyLine.currentIndex < historyLine.nodes.length - 1) {
+            historyLine.currentIndex += 1;
+          }
+          refresh();
+        }}
+      />
+    </div>
+  )
+}
 
 interface ChatLineProps {
   historyLine: HistoryLine;
@@ -17,8 +54,6 @@ export const ChatLine: React.FC<ChatLineProps> = ({ historyLine }) => {
   const [hover, setHover] = React.useState(false);
   const currentNode = historyLine.nodes[historyLine.currentIndex];
   const message = currentNode.message;
-  const iconClassname = "text-gray-600 hover:text-gray-800 hover:cursor-pointer"
-  const iconSize = 18;
   const { enqueueSnackbar } = useSnackbar();
   const { refresh, setLastLine } = useHistoryStore();
   const { setReGenerating } = useStatusStore();
@@ -28,7 +63,7 @@ export const ChatLine: React.FC<ChatLineProps> = ({ historyLine }) => {
     navigator.clipboard.writeText(message.content)
   }
 
-  const reGenerate = () => {
+  const reGenerateRequest = () => {
     historyLine.nodes.push({
       message: {
         sender: 'bot',
@@ -62,15 +97,20 @@ export const ChatLine: React.FC<ChatLineProps> = ({ historyLine }) => {
               {
                 message.sender === 'bot' ? (
                   <div className='absolute top-0 w-10 flex'>
+                    {
+                      historyLine.nodes.length > 1 ?  (
+                        <NodeSwitcher historyLine={historyLine}/>
+                      ) : null
+                    }
                     <ContentCopyIcon
-                      className={iconClassname}
+                      className={iconClassname+ " pt-0.5"}
                       sx={{height: iconSize - 2}}
                       onClick={handleCopy}
                       />
                     <RefreshIcon
                       className={iconClassname}
                       sx={{height: iconSize + 1}}
-                      onClick={reGenerate}
+                      onClick={reGenerateRequest}
                       />
                   </div>
                 ) : null
