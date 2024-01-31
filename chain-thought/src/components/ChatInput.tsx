@@ -20,14 +20,15 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSubmit }) => {
 
   return (
     <div
-      className="flex gap-1 items-center border-t-2 border-gray-200 px-1 py-3"
+      className="flex gap-1 items-center border-t-2 border-gray-200 px-1 pt-3"
     >
       <TextField
         value={message}
         onChange={(e) => setMessage(e.target.value)}
-        className="flex-grow outline-none"
+        className="flex-grow outline-none "
         placeholder="Type here, Enter to send, Shift+Enter to new line."
         multiline
+        maxRows={10}
         onKeyDown={(e) => {
           if (e.key === 'Enter' && !e.shiftKey && !generating) {
             handleSubmit(e);
