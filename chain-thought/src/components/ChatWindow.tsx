@@ -19,27 +19,27 @@ function flushMathJax() {
 
 
 export const ChatWindow: React.FC = () => {
-  const { root, addNewLine, setLastMessage } = useHistoryStore((state) => state);
+  const { root, addNewLine, appendLastMessage } = useHistoryStore((state) => state);
   const [lines, setLines] = useState<HistoryLine[]>([]);
-  const [reply, setReply] = useState<string>("");
-  const { apiKey, model, mathJax } = useSettingStore((state) => state);
+  const { apiKey, model, mathJax, generateDecision } = useSettingStore((state) => state);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const { enqueueSnackbar } = useSnackbar();
-  const { setApiKeyError, setGenerating } = useStatusStore((state) => state);
+  const { setApiKeyError, setGenerating, reGenerating, setReGenerating } = useStatusStore((state) => state);
 
   const handleMessageReceived = (recv: string) => {
     if (recv === "[start]") {
       setGenerating(true)
-      addNewLine({sender: 'bot', content: "", timestamp: new Date().toLocaleTimeString()})
+      if (!reGenerating) {
+        addNewLine({sender: 'bot', content: "", timestamp: new Date().toLocaleTimeString()})
+      }
     } else if (recv === "[end]") {
-      setReply("")
       if (mathJax) {
         flushMathJax();
       }
       setGenerating(false)
     } else {
       console.log(recv)
-      setReply((prev) => prev.concat(recv))
+      appendLastMessage(recv);
     }
   };
 
@@ -48,19 +48,13 @@ export const ChatWindow: React.FC = () => {
   };
 
   useEffect(() => {
-    if (reply) {
-      setLastMessage({ sender: "bot", content: reply, timestamp: new Date().toLocaleTimeString()});
-    }
-  }, [reply])
-
-  useEffect(() => {
     setLines(getLinearLines(root));
   }, [root]);
 
   useEffect(() => {
     const messages = getLinesMessages(lines);
     const lastMessage = messages[messages.length - 1];
-    if (lastMessage && lastMessage.sender === 'user') {
+    if (lastMessage && generateDecision(lastMessage) || reGenerating) {
       if (mathJax) {
         flushMathJax();
       }
@@ -76,8 +70,10 @@ export const ChatWindow: React.FC = () => {
           setApiKeyError(true);
           errMsg = "Invalid API key."
         }
+        setGenerating(false);
         enqueueSnackbar(errMsg, { variant: 'error' });
       });
+      setReGenerating(false);
     }
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });

@@ -13,6 +13,8 @@ interface SettingProps {
   setModel: (model: string) => void;
   mathJax: boolean;
   setMathJax: (useMathJax: boolean) => void;
+  generateDecision: (lastMessage: Message) => boolean;
+  setGenerateDecision: (generateDecision: (lastMessage: Message) => boolean) => void;
 }
 
 export const useSettingStore = create<SettingProps>((set) => ({
@@ -22,6 +24,13 @@ export const useSettingStore = create<SettingProps>((set) => ({
   setModel: (model) => set({ model }),
   mathJax: false,
   setMathJax: (mathJax) => set({ mathJax }),
+  generateDecision: (lastMessage) => {
+    if (lastMessage.sender === "user") {
+      return true;
+    }
+    return false;
+  },
+  setGenerateDecision: (generateDecision) => set({ generateDecision }),
 }));
 
 
@@ -30,6 +39,8 @@ interface StatusProps {
   setApiKeyError: (apiKeyError: boolean) => void;
   generating: boolean;
   setGenerating: (generating: boolean) => void;
+  reGenerating: boolean;
+  setReGenerating: (reGenerating: boolean) => void;
 }
 
 export const useStatusStore = create<StatusProps>((set) => ({
@@ -37,18 +48,23 @@ export const useStatusStore = create<StatusProps>((set) => ({
   setApiKeyError: (apiKeyError) => set({ apiKeyError }),
   generating: false,
   setGenerating: (generating) => set({ generating }),
+  reGenerating: false,
+  setReGenerating: (r) => set({ reGenerating: r}),
 }));
 
 
 interface HistoryProps {
   root: HistoryLine;
   last: HistoryLine;
+  setLastLine: (line: HistoryLine) => void;
+  refresh: () => void;
   addNewLine: (message: Message) => void;
   setLastMessage: (message: Message) => void;
+  appendLastMessage: (token: string) => void;
 }
 
 
-export const useHistoryStore = create<HistoryProps>((set) => {
+export const useHistoryStore = create<HistoryProps>((set, get) => {
   const root = {
     nodes: [],
     currentIndex: -1,
@@ -57,46 +73,65 @@ export const useHistoryStore = create<HistoryProps>((set) => {
     root: root,
     last: root,
 
-    addNewLine: (message) => set(state => {
+    refresh: () => set(state => {
+      const newRoot = Object.assign({}, state.root);
+      return {
+        root: newRoot,
+      }
+    }),
+
+    setLastLine: (line) => {
+      set({
+        last: line,
+      })
+    },
+
+    addNewLine: (message) => {
+      const state = get();
       if (state.root.currentIndex < 0) {
         const newRoot = {
           nodes: [{ message, next: null }],
           currentIndex: 0,
         }
-        return {
+        set({
           root: newRoot,
           last: newRoot,
-        }
+        })
       } else {
         const newRoot = Object.assign({}, state.root);
         const lastNode = state.last.nodes[state.last.currentIndex];
         const newLine = { nodes: [{ message, next: null }], currentIndex: 0 };
         lastNode.next = newLine;
-        return {
+        set({
           root: newRoot,
           last: newLine,
-        }
+        })
       }
-    }),
+    },
 
-    setLastMessage: (message) => set(state => {
+    setLastMessage: (message) => {
+      const state = get();
       if (state.root.currentIndex < 0) {
         const newRoot = {
           nodes: [{ message, next: null }],
           currentIndex: 0,
         }
-        return {
+        set({
           root: newRoot,
           last: newRoot,
-        }
+        })
       } else {
-        const newRoot = Object.assign({}, state.root);
         const lastNode = state.last.nodes[state.last.currentIndex];
         lastNode.message = message;
-        return {
-          root: newRoot,
-          last: state.last,
-        }
+        state.refresh();
       }
-    }),
+    },
+
+    appendLastMessage: (token) =>  {
+      const state = get();
+      const lastNode = state.last.nodes[state.last.currentIndex];
+      const lastMessage = lastNode.message;
+      lastMessage.content += token;
+      state.setLastMessage(lastMessage);
+    },
 }});

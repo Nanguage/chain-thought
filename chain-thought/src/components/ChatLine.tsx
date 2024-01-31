@@ -7,6 +7,7 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import EditIcon from '@mui/icons-material/Edit';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { useSnackbar } from 'notistack';
+import { useHistoryStore, useStatusStore } from '../store';
 
 interface ChatLineProps {
   historyLine: HistoryLine;
@@ -19,10 +20,27 @@ export const ChatLine: React.FC<ChatLineProps> = ({ historyLine }) => {
   const iconClassname = "text-gray-600 hover:text-gray-800 hover:cursor-pointer"
   const iconSize = 18;
   const { enqueueSnackbar } = useSnackbar();
+  const { refresh, setLastLine } = useHistoryStore();
+  const { setReGenerating } = useStatusStore();
 
   const handleCopy = () => {
     enqueueSnackbar('Copied to clipboard');
     navigator.clipboard.writeText(message.content)
+  }
+
+  const reGenerate = () => {
+    historyLine.nodes.push({
+      message: {
+        sender: 'bot',
+        content: '',
+        timestamp: new Date().toLocaleTimeString()
+      },
+      next: null
+    })
+    historyLine.currentIndex = historyLine.nodes.length - 1;
+    setReGenerating(true);
+    setLastLine(historyLine);
+    refresh();
   }
 
   return (
@@ -37,7 +55,7 @@ export const ChatLine: React.FC<ChatLineProps> = ({ historyLine }) => {
         </div>
       </div>
       <ChatMessage message={message} />
-      <div className={"flex mb-4 justify-between"}>
+      <div className={"flex mb-1 justify-between"}>
         {
           hover ? (
             <div className='relative'>
@@ -51,7 +69,9 @@ export const ChatLine: React.FC<ChatLineProps> = ({ historyLine }) => {
                       />
                     <RefreshIcon
                       className={iconClassname}
-                      sx={{height: iconSize + 1}}/>
+                      sx={{height: iconSize + 1}}
+                      onClick={reGenerate}
+                      />
                   </div>
                 ) : null
               }
