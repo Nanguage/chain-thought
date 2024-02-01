@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist, createJSONStorage } from 'zustand/middleware'
 import { Message, HistoryLine } from "./types";
 
 // Please set your API key in .env file, e.g.: VITE_OPENAI_API_KEY=your-api-key
@@ -17,21 +18,30 @@ interface SettingProps {
   setGenerateDecision: (generateDecision: (lastMessage: Message) => boolean) => void;
 }
 
-export const useSettingStore = create<SettingProps>((set) => ({
-  apiKey: defaultApiKey,
-  setApiKey: (apiKey) => set({ apiKey }),
-  model: defaultModel,
-  setModel: (model) => set({ model }),
-  mathJax: false,
-  setMathJax: (mathJax) => set({ mathJax }),
-  generateDecision: (lastMessage) => {
-    if (lastMessage.sender === "user") {
-      return true;
+
+export const useSettingStore = create(
+  persist<SettingProps>(
+    (set) => ({
+      apiKey: defaultApiKey,
+      setApiKey: (apiKey) => set({ apiKey }),
+      model: defaultModel,
+      setModel: (model) => set({ model }),
+      mathJax: false,
+      setMathJax: (mathJax) => set({ mathJax }),
+      generateDecision: (lastMessage) => {
+        if (lastMessage.sender === "user") {
+          return true;
+        }
+        return false;
+      },
+      setGenerateDecision: (generateDecision) => set({ generateDecision }),
+    }),
+    {
+      name: 'chain-thought-setting',
+      storage: createJSONStorage(() => localStorage),
     }
-    return false;
-  },
-  setGenerateDecision: (generateDecision) => set({ generateDecision }),
-}));
+  )
+);
 
 
 interface StatusProps {
@@ -42,6 +52,7 @@ interface StatusProps {
   reGenerating: boolean;
   setReGenerating: (reGenerating: boolean) => void;
 }
+
 
 export const useStatusStore = create<StatusProps>((set) => ({
   apiKeyError: false,
