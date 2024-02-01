@@ -76,82 +76,91 @@ interface HistoryProps {
 }
 
 
-export const useHistoryStore = create<HistoryProps>((set, get) => {
-  const root = {
-    nodes: [],
-    currentIndex: -1,
-  }
-  return {
-    root: root,
-    last: root,
-
-    refresh: () => set(state => {
-      const newRoot = Object.assign({}, state.root);
+export const useHistoryStore = create(
+  persist<HistoryProps>(
+    (set, get) => {
+      const root = {
+        nodes: [],
+        currentIndex: -1,
+      }
       return {
-        root: newRoot,
+        root: root,
+        last: root,
+
+        refresh: () => set(state => {
+          const newRoot = Object.assign({}, state.root);
+          return {
+            root: newRoot,
+          }
+        }),
+
+        setLastLine: (line) => {
+          set({
+            last: line,
+          })
+        },
+
+        addNewLine: (message) => {
+          const state = get();
+          if (state.root.currentIndex < 0) {
+            const newRoot = {
+              nodes: [{ message, next: null }],
+              currentIndex: 0,
+            }
+            set({
+              root: newRoot,
+              last: newRoot,
+            })
+          } else {
+            const newRoot = Object.assign({}, state.root);
+            const lastNode = state.last.nodes[state.last.currentIndex];
+            const newLine = { nodes: [{ message, next: null }], currentIndex: 0 };
+            lastNode.next = newLine;
+            set({
+              root: newRoot,
+              last: newLine,
+            })
+          }
+        },
+
+        setLastMessage: (message) => {
+          const state = get();
+          if (state.root.currentIndex < 0) {
+            const newRoot = {
+              nodes: [{ message, next: null }],
+              currentIndex: 0,
+            }
+            set({
+              root: newRoot,
+              last: newRoot,
+            })
+          } else {
+            const lastNode = state.last.nodes[state.last.currentIndex];
+            lastNode.message = message;
+            state.refresh();
+          }
+        },
+
+        setLastContent: (content) => {
+          const state = get();
+          const lastNode = state.last.nodes[state.last.currentIndex];
+          const lastMessage = lastNode.message;
+          lastMessage.content = content;
+          lastMessage.timestamp = new Date().toLocaleTimeString();
+          state.setLastMessage(lastMessage);
+        },
+
+        appendLastMessage: (token) =>  {
+          const state = get();
+          const lastNode = state.last.nodes[state.last.currentIndex];
+          const lastMessage = lastNode.message;
+          state.setLastContent(lastMessage.content + token);
+        },
       }
-    }),
-
-    setLastLine: (line) => {
-      set({
-        last: line,
-      })
     },
-
-    addNewLine: (message) => {
-      const state = get();
-      if (state.root.currentIndex < 0) {
-        const newRoot = {
-          nodes: [{ message, next: null }],
-          currentIndex: 0,
-        }
-        set({
-          root: newRoot,
-          last: newRoot,
-        })
-      } else {
-        const newRoot = Object.assign({}, state.root);
-        const lastNode = state.last.nodes[state.last.currentIndex];
-        const newLine = { nodes: [{ message, next: null }], currentIndex: 0 };
-        lastNode.next = newLine;
-        set({
-          root: newRoot,
-          last: newLine,
-        })
-      }
-    },
-
-    setLastMessage: (message) => {
-      const state = get();
-      if (state.root.currentIndex < 0) {
-        const newRoot = {
-          nodes: [{ message, next: null }],
-          currentIndex: 0,
-        }
-        set({
-          root: newRoot,
-          last: newRoot,
-        })
-      } else {
-        const lastNode = state.last.nodes[state.last.currentIndex];
-        lastNode.message = message;
-        state.refresh();
-      }
-    },
-
-    setLastContent: (content) => {
-      const state = get();
-      const lastNode = state.last.nodes[state.last.currentIndex];
-      const lastMessage = lastNode.message;
-      lastMessage.content = content;
-      lastMessage.timestamp = new Date().toLocaleTimeString();
-      state.setLastMessage(lastMessage);
-    },
-
-    appendLastMessage: (token) =>  {
-      const state = get();
-      const lastNode = state.last.nodes[state.last.currentIndex];
-      const lastMessage = lastNode.message;
-      state.setLastContent(lastMessage.content + token);
-    },
-}});
+    {
+      name: 'chain-thought-history',
+      storage: createJSONStorage(() => localStorage),
+    }
+  )
+);
