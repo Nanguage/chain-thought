@@ -18,6 +18,8 @@ export async function sendMessage(
     content: message.content,
   }));
 
+  onMessageReceived('[new]');
+
   const stream = await OpenAI("chat", {
     model: model,
     messages: formattedMessages,

@@ -21,6 +21,9 @@ const iconClassname = "text-gray-600 hover:text-gray-800 hover:cursor-pointer"
 
 const NodeSwitcher: React.FC<{historyLine: HistoryLine}> = ({ historyLine }) => {
   const { root, refresh, setLastLine } = useHistoryStore();
+  const { enqueueSnackbar } = useSnackbar();
+  const { generating } = useStatusStore();
+
   const setLast = () => {
     const lines = getLinearLines(root)
     setLastLine(lines[lines.length - 1])
@@ -32,6 +35,10 @@ const NodeSwitcher: React.FC<{historyLine: HistoryLine}> = ({ historyLine }) => 
         className={iconClassname}
         sx={{height: iconSize}}
         onClick={() => {
+          if (generating) {
+            enqueueSnackbar('Please wait for the current generation to finish.', {variant: 'error'});
+            return;
+          }
           if (historyLine.currentIndex > 0) {
             historyLine.currentIndex -= 1;
           }
@@ -44,6 +51,10 @@ const NodeSwitcher: React.FC<{historyLine: HistoryLine}> = ({ historyLine }) => 
         className={iconClassname}
         sx={{height: iconSize}}
         onClick={() => {
+          if (generating) {
+            enqueueSnackbar('Please wait for the current generation to finish.', {variant: 'error'});
+            return;
+          }
           if (historyLine.currentIndex < historyLine.nodes.length - 1) {
             historyLine.currentIndex += 1;
           }
@@ -65,7 +76,7 @@ export const ChatLine: React.FC<ChatLineProps> = ({ historyLine }) => {
   const message = currentNode.message;
   const { enqueueSnackbar } = useSnackbar();
   const { refresh, setLastLine } = useHistoryStore();
-  const { setReGenerating } = useStatusStore();
+  const { setReGenerating, generating } = useStatusStore();
   const [editing, setEditing] = React.useState(false);
   const [newContent, setNewContent] = React.useState("");
 
@@ -75,6 +86,10 @@ export const ChatLine: React.FC<ChatLineProps> = ({ historyLine }) => {
   }
 
   const reGenerateRequest = () => {
+    if (generating) {
+      enqueueSnackbar('Please wait for the current generation to finish.', {variant: 'error'});
+      return;
+    }
     historyLine.nodes.push({
       message: {
         sender: 'bot',
@@ -95,6 +110,10 @@ export const ChatLine: React.FC<ChatLineProps> = ({ historyLine }) => {
   }
 
   const handleFinishEditing = () => {
+    if (generating) {
+      enqueueSnackbar('Please wait for the current generation to finish.', {variant: 'error'});
+      return;
+    }
     if (newContent === message.content) {
       setEditing(false);
       return;

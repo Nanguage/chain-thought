@@ -19,7 +19,7 @@ function flushMathJax() {
 
 
 export const ChatWindow: React.FC = () => {
-  const { root, addNewLine, appendLastMessage } = useHistoryStore((state) => state);
+  const { root, addNewLine, appendLastMessage, setLastContent } = useHistoryStore((state) => state);
   const [lines, setLines] = useState<HistoryLine[]>([]);
   const { apiKey, model, mathJax, generateDecision } = useSettingStore((state) => state);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -27,11 +27,14 @@ export const ChatWindow: React.FC = () => {
   const { setApiKeyError, setGenerating, reGenerating, setReGenerating } = useStatusStore((state) => state);
 
   const handleMessageReceived = (recv: string) => {
-    if (recv === "[start]") {
+    if (recv === "[new]") {
       setGenerating(true)
       if (!reGenerating) {
-        addNewLine({sender: 'bot', content: "", timestamp: new Date().toLocaleTimeString()})
+        addNewLine({sender: 'bot', content: "**Wait to response...**", timestamp: new Date().toLocaleTimeString()})
       }
+    } else if (recv === "[start]") {
+      console.log("start response...")
+      setLastContent("");
     } else if (recv === "[end]") {
       if (mathJax) {
         flushMathJax();

@@ -60,6 +60,7 @@ interface HistoryProps {
   refresh: () => void;
   addNewLine: (message: Message) => void;
   setLastMessage: (message: Message) => void;
+  setLastContent: (content: string) => void;
   appendLastMessage: (token: string) => void;
 }
 
@@ -127,11 +128,19 @@ export const useHistoryStore = create<HistoryProps>((set, get) => {
       }
     },
 
+    setLastContent: (content) => {
+      const state = get();
+      const lastNode = state.last.nodes[state.last.currentIndex];
+      const lastMessage = lastNode.message;
+      lastMessage.content = content;
+      lastMessage.timestamp = new Date().toLocaleTimeString();
+      state.setLastMessage(lastMessage);
+    },
+
     appendLastMessage: (token) =>  {
       const state = get();
       const lastNode = state.last.nodes[state.last.currentIndex];
       const lastMessage = lastNode.message;
-      lastMessage.content += token;
-      state.setLastMessage(lastMessage);
+      state.setLastContent(lastMessage.content + token);
     },
 }});
