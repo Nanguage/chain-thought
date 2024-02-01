@@ -25,6 +25,23 @@ export const ChatWindow: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const { enqueueSnackbar } = useSnackbar();
   const { setApiKeyError, setGenerating, reGenerating, setReGenerating } = useStatusStore((state) => state);
+  const [hasRendered, setHasRendered] = useState(false);
+
+  const scrollToBottom = () => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  useEffect(() => {
+    setHasRendered(true);
+  }, []);
+
+  useEffect(() => {
+    if (hasRendered) {
+      scrollToBottom();
+    }
+  }, [hasRendered]);
 
   const handleMessageReceived = (recv: string) => {
     if (recv === "[new]") {
@@ -39,10 +56,8 @@ export const ChatWindow: React.FC = () => {
       if (mathJax) {
         flushMathJax();
       }
-      setGenerating(false)
-      if (messagesEndRef.current) {
-        messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-      }
+      setGenerating(false);
+      scrollToBottom();
     } else {
       console.log(recv)
       appendLastMessage(recv);

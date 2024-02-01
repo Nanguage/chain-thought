@@ -62,7 +62,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message, editing, setN
                 />
               </div>
             ) : (
-              <code {...rest} className={className + " bg-gray-500 text-white px-1 py-0.2 rounded"}>
+              <code {...rest} className={className}>
                 {children}
               </code>
             )
