@@ -931,11 +931,6 @@ dom-helpers@^5.0.1:
     "@babel/runtime" "^7.8.7"
     csstype "^3.0.2"
 
-dotenv@^16.0.3:
-  version "16.0.3"
-  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-16.0.3.tgz#115aec42bac5053db3c456db30cc243a5a836a07"
-  integrity sha512-7GO6HghkA5fYG9TYnNxi14/7K9f5occMlp3zXAuSxn7CKCxt9xbNWG7yF8hTCSUchlfWSe3uLmlPfigevRItzQ==
-
 electron-to-chromium@^1.4.284:
   version "1.4.348"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.348.tgz#f49379dc212d79f39112dd026f53e371279e433d"
@@ -996,10 +991,10 @@ estree-util-is-identifier-name@^3.0.0:
   resolved "https://registry.yarnpkg.com/estree-util-is-identifier-name/-/estree-util-is-identifier-name-3.0.0.tgz#0b5ef4c4ff13508b34dcd01ecfa945f61fce5dbd"
   integrity sha512-hFtqIDZTIUZ9BXLb8y4pYGyk6+wekIivNVTcmvk8NoOh+VeRn5y6cEHzbURrWbfp1fIqdVipilzj+lfaadNZmg==
 
-eventsource-parser@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/eventsource-parser/-/eventsource-parser-0.1.0.tgz#4a6b84751ca8e704040e6f7f50e7d77344fa1b7c"
-  integrity sha512-M9QjFtEIkwytUarnx113HGmgtk52LSn3jNAtnWKi3V+b9rqSfQeVdLsaD5AG/O4IrGQwmAAHBIsqbmURPTd2rA==
+eventsource-parser@^1.0.0:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/eventsource-parser/-/eventsource-parser-1.1.1.tgz#576f8bcf391c5e5ccdea817abd9ead36d1754247"
+  integrity sha512-3Ej2iLj6ZnX+5CMxqyUb8syl9yVZwcwm8IIMrOJlF7I51zxOOrRlU3zxSb/6hFbl03ts1ZxHAGJdWLZOLyKG7w==
 
 extend@^3.0.0:
   version "3.0.2"
@@ -1768,20 +1763,19 @@ once@^1.3.0:
   dependencies:
     wrappy "1"
 
-openai-streams@^4.2.0:
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/openai-streams/-/openai-streams-4.2.0.tgz#a097dd86551f7c6360004515a4623a6f6eb1682d"
-  integrity sha512-tbOEJez1mB2Uc1HtYO1arAyT+kPQCv1iOQNN6rL/onJmxJ2HUGETd9LK6VqnZWCKQX4HuRXWFu9EpP6I5zWf8A==
+openai-streams@^6.2.0:
+  version "6.2.0"
+  resolved "https://registry.yarnpkg.com/openai-streams/-/openai-streams-6.2.0.tgz#1882bb3a65db1fcbaf73c85c2ef46148ff4b7e80"
+  integrity sha512-iP4CfmkXhPoRQhnO2663mOXP0rgGC++7PuuH6lqbfyMIK+G6Qo4TtfIHsMePdHtm6OOA5yQJ/Pi6MwC9tnJepg==
   dependencies:
-    dotenv "^16.0.3"
-    eventsource-parser "^0.1.0"
-    openai "^3.2.1"
+    eventsource-parser "^1.0.0"
+    openai "^3.3.0"
     yield-stream "^3.0.0"
 
-openai@^3.2.1:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/openai/-/openai-3.2.1.tgz#1fa35bdf979cbde8453b43f2dd3a7d401ee40866"
-  integrity sha512-762C9BNlJPbjjlWZi4WYK9iM2tAVAv0uUp1UmI34vb0CN5T2mjB/qM6RYBmNKMh/dN9fC+bxqPwWJZUTWW052A==
+openai@^3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/openai/-/openai-3.3.0.tgz#a6408016ad0945738e1febf43f2fccca83a3f532"
+  integrity sha512-uqxI/Au+aPRnsaQRe8CojU0eCR7I0mBiKjD3sNMzY6DaC1ZVrc85u98mtJW6voDug8fgGN+DIZmTDxTthxb7dQ==
   dependencies:
     axios "^0.26.0"
     form-data "^4.0.0"

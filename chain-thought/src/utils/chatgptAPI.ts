@@ -34,29 +34,19 @@ export async function sendMessage(
   const decoder = new TextDecoder("utf-8");
 
   async function readStream() {
+    onMessageReceived('[start]');
     while (true) {
       const { value, done } = await reader.read();
       if (done) {
+        onMessageReceived('[end]');
         return;
       }
 
       // sleep for 0.01 seconds
       await new Promise((resolve) => setTimeout(resolve, 10));
 
-      const text = decoder.decode(value);
-      const rep = JSON.parse(text)
-      // if role in rep, content = '[start]'
-      // elif content not in rep, content = '[end]'
-      let content
-      if (rep['role'] === 'assistant') {
-        content = '[start]'
-      } else if (rep['content'] === undefined) {
-        content = '[end]'
-      } else {
-        content = rep['content']
-      }
-
-      onMessageReceived(content);
+      const rep = decoder.decode(value);
+      onMessageReceived(rep);
     }
   }
 

@@ -100,7 +100,6 @@ export const ChatLine: React.FC<ChatLineProps> = ({ historyLine }) => {
     })
     historyLine.currentIndex = historyLine.nodes.length - 1;
     setReGenerating(true);
-    setLastLine(historyLine);
     refresh();
   }
 
@@ -128,7 +127,6 @@ export const ChatLine: React.FC<ChatLineProps> = ({ historyLine }) => {
       next: null
     })
     historyLine.currentIndex = historyLine.nodes.length - 1;
-    setLastLine(historyLine);
     refresh();
   }
 

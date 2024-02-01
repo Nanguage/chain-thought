@@ -1,10 +1,10 @@
 # ChainThought
 
-A simple LLM client.
+A simple LLM client which support the non linear history editing.
 
 ## TODO
 
-- [ ] History editing and saving
+- [x] History editing and saving
 - [ ] RAG support
 - [ ] Plugin system
 

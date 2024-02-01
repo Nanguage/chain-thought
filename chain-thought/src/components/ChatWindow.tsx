@@ -19,7 +19,7 @@ function flushMathJax() {
 
 
 export const ChatWindow: React.FC = () => {
-  const { root, addNewLine, appendLastMessage, setLastContent } = useHistoryStore((state) => state);
+  const { root, addNewLine, appendLastMessage, setLastContent, setLastLine } = useHistoryStore((state) => state);
   const [lines, setLines] = useState<HistoryLine[]>([]);
   const { apiKey, model, mathJax, generateDecision } = useSettingStore((state) => state);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -54,7 +54,9 @@ export const ChatWindow: React.FC = () => {
   };
 
   useEffect(() => {
-    setLines(getLinearLines(root));
+    const lines = getLinearLines(root);
+    setLastLine(lines[lines.length - 1]);
+    setLines(lines);
   }, [root]);
 
   useEffect(() => {
