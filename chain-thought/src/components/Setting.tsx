@@ -6,6 +6,8 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import Select from '@mui/material/Select';
 import { MenuItem } from '@mui/material';
 import Checkbox from '@mui/material/Checkbox';
+import DialogActions from '@mui/material/DialogActions';
+import Button from '@mui/material/Button';
 
 import { useSettingStore, useStatusStore } from '../store';
 import { models } from '../constants';
@@ -88,7 +90,9 @@ const Setting = () => {
             </div>
           </div>
         </DialogContent>
-
+        <DialogActions>
+          <Button size="large" onClick={() => setIsOpen(false)}>Save</Button>
+        </DialogActions>
       </Dialog>
     </div>
   );
