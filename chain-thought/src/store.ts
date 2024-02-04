@@ -49,8 +49,10 @@ interface StatusProps {
   setApiKeyError: (apiKeyError: boolean) => void;
   generating: boolean;
   setGenerating: (generating: boolean) => void;
-  reGenerating: boolean;
-  setReGenerating: (reGenerating: boolean) => void;
+  reGenerateFlag: boolean;
+  setReGenerateFlag: (flag: boolean) => void;
+  stopFlag: boolean;
+  setStopFlag: (flag: boolean) => void;
 }
 
 
@@ -59,8 +61,10 @@ export const useStatusStore = create<StatusProps>((set) => ({
   setApiKeyError: (apiKeyError) => set({ apiKeyError }),
   generating: false,
   setGenerating: (generating) => set({ generating }),
-  reGenerating: false,
-  setReGenerating: (r) => set({ reGenerating: r}),
+  reGenerateFlag: false,
+  setReGenerateFlag: (r) => set({ reGenerateFlag: r}),
+  stopFlag: false,
+  setStopFlag: (flag) => set({ stopFlag: flag }),
 }));
 
 

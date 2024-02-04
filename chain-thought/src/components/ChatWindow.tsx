@@ -5,6 +5,8 @@ import { sendMessage } from '../utils/chatgptAPI';
 import { HistoryLine } from '../types';
 import { getLinearLines, getLinesMessages } from '../utils/history';
 import { useSnackbar } from 'notistack';
+import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown';
+import IconButton from '@mui/material/IconButton';
 
 import { useSettingStore, useStatusStore, useHistoryStore } from '../store';
 import Setting from './Setting';
@@ -24,29 +26,58 @@ export const ChatWindow: React.FC = () => {
   const { apiKey, model, mathJax, generateDecision } = useSettingStore((state) => state);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const { enqueueSnackbar } = useSnackbar();
-  const { setApiKeyError, setGenerating, reGenerating, setReGenerating } = useStatusStore((state) => state);
+  const {
+    setApiKeyError, setGenerating,
+    reGenerateFlag, setReGenerateFlag,
+    stopFlag, setStopFlag
+  } = useStatusStore((state) => state);
   const [hasRendered, setHasRendered] = useState(false);
+  const stopFlagRef = useRef(stopFlag);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [showScrollButton, setShowScrollButton] = useState(false);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = (isSmooth=true) => {
     if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      if (isSmooth) {
+        messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        messagesEndRef.current.scrollIntoView();
+      }
     }
   };
 
+  const atTheBottom = () => {
+    if (messagesEndRef.current) {
+      return messagesEndRef.current.getBoundingClientRect().bottom <= window.innerHeight;
+    }
+    return false;
+  }
+
   useEffect(() => {
     setHasRendered(true);
+
+    const handleScroll = () => {
+      setShowScrollButton(!atTheBottom());
+    };
+
+    const container = containerRef.current;
+    if (!container) return;
+    container.addEventListener('scroll', handleScroll);
+    return () => {
+      container.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
   useEffect(() => {
     if (hasRendered) {
-      scrollToBottom();
+      scrollToBottom(false);
     }
   }, [hasRendered]);
 
   const handleMessageReceived = (recv: string) => {
     if (recv === "[new]") {
       setGenerating(true)
-      if (!reGenerating) {
+      if (!reGenerateFlag) {
         addNewLine({sender: 'bot', content: "**Wait to response...**", timestamp: new Date().toLocaleTimeString()})
       }
     } else if (recv === "[start]") {
@@ -57,12 +88,20 @@ export const ChatWindow: React.FC = () => {
         flushMathJax();
       }
       setGenerating(false);
-      scrollToBottom();
     } else {
       console.log(recv)
       appendLastMessage(recv);
+      if (stopFlagRef.current) {
+        setStopFlag(false);
+        return false;
+      }
     }
+    return true;
   };
+
+  useEffect(() => {
+    stopFlagRef.current = stopFlag;
+  }, [stopFlag])
 
   const handleSendMessage = async (message: string) => {
     addNewLine({sender: 'user', content: message, timestamp: new Date().toLocaleTimeString()})
@@ -77,12 +116,12 @@ export const ChatWindow: React.FC = () => {
   useEffect(() => {
     const messages = getLinesMessages(lines);
     const lastMessage = messages[messages.length - 1];
-    if (lastMessage && generateDecision(lastMessage) || reGenerating) {
+    if (lastMessage && generateDecision(lastMessage) || reGenerateFlag) {
       if (mathJax) {
         flushMathJax();
       }
       console.log(messages)
-      const p = sendMessage(model, messages, apiKey, (recv) => handleMessageReceived(recv));
+      const p = sendMessage(model, messages, apiKey, handleMessageReceived);
       p.then((res) => {
         console.log(res)
         setApiKeyError(false);
@@ -96,7 +135,10 @@ export const ChatWindow: React.FC = () => {
         setGenerating(false);
         enqueueSnackbar(errMsg, { variant: 'error' });
       });
-      setReGenerating(false);
+      setReGenerateFlag(false);
+    }
+    if (atTheBottom()) {
+      scrollToBottom(false);
     }
   }, [lines]);
 
@@ -110,7 +152,7 @@ export const ChatWindow: React.FC = () => {
     <div className="flex flex-col h-full">
       <Setting />
       <hr/>
-      <div className="flex-grow overflow-y-auto p-4">
+      <div className="flex-grow overflow-y-auto p-4" ref={containerRef}>
         {lines.map((line, index) => (
           <ChatLine
             key={index}
@@ -118,6 +160,15 @@ export const ChatWindow: React.FC = () => {
           />
         ))}
         <div ref={messagesEndRef}></div>
+      </div>
+      <div className="w-full h-0 flex justify-center">
+        {
+          showScrollButton && (
+            <IconButton className="fixed bottom-10 h-15 z-100" color="primary" onClick={(e) => {scrollToBottom(true)}}>
+              <ExpandCircleDownIcon />
+            </IconButton>
+          )
+        }
       </div>
       <ChatInput onSubmit={handleSendMessage} />
     </div>

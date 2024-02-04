@@ -75,8 +75,8 @@ export const ChatLine: React.FC<ChatLineProps> = ({ historyLine }) => {
   const currentNode = historyLine.nodes[historyLine.currentIndex];
   const message = currentNode.message;
   const { enqueueSnackbar } = useSnackbar();
-  const { refresh, setLastLine } = useHistoryStore();
-  const { setReGenerating, generating } = useStatusStore();
+  const { refresh } = useHistoryStore();
+  const { setReGenerateFlag: setReGenerateFlag, generating } = useStatusStore();
   const [editing, setEditing] = React.useState(false);
   const [newContent, setNewContent] = React.useState("");
 
@@ -99,7 +99,7 @@ export const ChatLine: React.FC<ChatLineProps> = ({ historyLine }) => {
       next: null
     })
     historyLine.currentIndex = historyLine.nodes.length - 1;
-    setReGenerating(true);
+    setReGenerateFlag(true);
     refresh();
   }
 

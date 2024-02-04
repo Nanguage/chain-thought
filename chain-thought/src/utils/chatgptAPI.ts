@@ -11,7 +11,7 @@ export async function sendMessage(
   model: string,
   messages: Message[],
   apiKey: string,
-  onMessageReceived: (message: string) => void
+  onMessageReceived: (message: string) => boolean
 ): Promise<void> {
   const formattedMessages: ChatGPTMessage[] = messages.map((message) => ({
     role: convertSenderToRole(message.sender),
@@ -46,7 +46,12 @@ export async function sendMessage(
       await new Promise((resolve) => setTimeout(resolve, 10));
 
       const rep = decoder.decode(value);
-      onMessageReceived(rep);
+      const continueFlag = onMessageReceived(rep);
+      if (!continueFlag) {
+        onMessageReceived('[end]');
+        reader.cancel();
+        return;
+      }
     }
   }
 
