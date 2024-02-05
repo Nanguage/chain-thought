@@ -48,7 +48,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSubmit }) => {
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         className="flex-grow outline-none "
-        placeholder="Type here, Enter to send, Shift+Enter to new line."
+        placeholder="Enter: send, Shift+Enter: new line."
         multiline
         maxRows={10}
         onKeyDown={(e) => {

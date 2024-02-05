@@ -164,7 +164,7 @@ export const ChatWindow: React.FC = () => {
       <div className="w-full h-0 flex justify-center">
         {
           showScrollButton && (
-            <IconButton className="fixed bottom-10 h-15 z-100" color="primary" onClick={(e) => {scrollToBottom(true)}}>
+            <IconButton className="fixed bottom-10 h-10 z-100" color="primary" onClick={(e) => {scrollToBottom(true)}}>
               <ExpandCircleDownIcon />
             </IconButton>
           )
