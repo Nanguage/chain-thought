@@ -3,11 +3,10 @@ import { Dialog } from '@mui/material';
 import { DialogTitle, DialogContent } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import SettingsIcon from '@mui/icons-material/Settings';
-import Select from '@mui/material/Select';
-import { MenuItem } from '@mui/material';
 import Checkbox from '@mui/material/Checkbox';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
+import Autocomplete from '@mui/material/Autocomplete';
 
 import { useSettingStore, useStatusStore } from '../store';
 import { models } from '../constants';
@@ -46,6 +45,16 @@ const Setting = () => {
         <DialogContent>
           <div className='mt-1 flex flex-col gap-2'>
             <div>
+              <label id="apiBase-label" className='text-gray-500 text-sm'>
+                API Base URL
+              </label>
+              <TextField
+                id="apiBase"
+                value="https://api.openai.com/v1"
+                className='w-full'
+                ></TextField>
+            </div>
+            <div>
               <label id="apiKey-label" className='text-gray-500 text-sm'>
                 OpenAI API Key
               </label>
@@ -65,19 +74,17 @@ const Setting = () => {
               <label id="model-label" className='text-gray-500 text-sm'>
                 Model
               </label>
-              <Select
+              <Autocomplete
                 id="model"
-                labelId="model-label"
                 value={model}
-                onChange={(e) => setModel(e.target.value)}
+                onChange={(e, value) => {
+                  if (value === null) return;
+                  setModel(value)
+                }}
+                options={models}
                 className='w-full'
-                >
-                  {
-                    models.map((model, idx) => (
-                      <MenuItem key={idx} value={model}>{model}</MenuItem>
-                    ))
-                  }
-              </Select>
+                renderInput={(params) => <TextField {...params} />}
+                />
             </div>
             <div>
               <label id="mathjax-label" className='text-gray-500 text-sm mr-2'>

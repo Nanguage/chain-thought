@@ -23,7 +23,7 @@ function flushMathJax() {
 export const ChatWindow: React.FC = () => {
   const { root, addNewLine, appendLastMessage, setLastContent, setLastLine } = useHistoryStore((state) => state);
   const [lines, setLines] = useState<HistoryLine[]>([]);
-  const { apiKey, model, mathJax, generateDecision } = useSettingStore((state) => state);
+  const { apiBase, apiKey, model, mathJax, generateDecision } = useSettingStore((state) => state);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const { enqueueSnackbar } = useSnackbar();
   const {
@@ -121,7 +121,7 @@ export const ChatWindow: React.FC = () => {
         flushMathJax();
       }
       console.log(messages)
-      const p = sendMessage(model, messages, apiKey, handleMessageReceived);
+      const p = sendMessage(model, messages, apiKey, apiBase, handleMessageReceived);
       p.then((res) => {
         console.log(res)
         setApiKeyError(false);

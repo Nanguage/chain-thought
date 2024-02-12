@@ -11,6 +11,7 @@ export async function sendMessage(
   model: string,
   messages: Message[],
   apiKey: string,
+  apiBase: string,
   onMessageReceived: (message: string) => boolean
 ): Promise<void> {
   const formattedMessages: ChatGPTMessage[] = messages.map((message) => ({
@@ -27,7 +28,10 @@ export async function sendMessage(
     top_p: 1,
     frequency_penalty: 0,
     presence_penalty: 0,
-  }, { apiKey });
+  }, {
+    apiKey,
+    apiBase,
+  });
 
 
   const reader = stream.getReader();

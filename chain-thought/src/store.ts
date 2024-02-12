@@ -5,9 +5,10 @@ import { Message, HistoryLine } from "./types";
 // Please set your API key in .env file, e.g.: VITE_OPENAI_API_KEY=your-api-key
 const defaultApiKey = import.meta.env.VITE_OPENAI_API_KEY;
 
-const defaultModel = "gpt-4-1106-preview";
+const defaultModel = "gpt-4-0125-preview";
 
 interface SettingProps {
+  apiBase: string;
   apiKey: string;
   setApiKey: (apiKey: string) => void;
   model: string;
@@ -22,6 +23,7 @@ interface SettingProps {
 export const useSettingStore = create(
   persist<SettingProps>(
     (set) => ({
+      apiBase: "https://api.openai.com/v1",
       apiKey: defaultApiKey,
       setApiKey: (apiKey) => set({ apiKey }),
       model: defaultModel,
